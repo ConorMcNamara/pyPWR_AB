@@ -1,16 +1,17 @@
 from pwrAB.pwr_classes import ab_t2n_class, ab_t2n_prop_class
 
+
 def ab_t2n(
-    n: int = None,
-    percent_b: float = None,
-    mean_diff: float = None,
-    sd_a: float = 1,
-    sd_b: float = 1,
-    sig_level: float = None,
-    power: float = None,
-    alternative: str = "two-sided",
-    max_sample: int = 1e07,
-    print_pretty: bool = True
+        n: int = None,
+        percent_b: float = None,
+        mean_diff: float = None,
+        sd_a: float = 1,
+        sd_b: float = 1,
+        sig_level: float = None,
+        power: float = None,
+        alternative: str = "two-sided",
+        max_sample: int = 1e07,
+        print_pretty: bool = True
 ) -> dict:
     """AB_t2n performs the power analysis for AB testing. It uses the Welch’s t-test, which allows for the standard
     deviation to vary across groups.
