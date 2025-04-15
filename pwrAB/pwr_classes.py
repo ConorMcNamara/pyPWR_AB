@@ -1,7 +1,7 @@
 from math import pow, sqrt, ceil
 
 from scipy.stats import t as t_dist, nct
-from scipy.optimize import brentq
+from scipy.optimize import brentq, bisect
 
 import numpy as np
 
