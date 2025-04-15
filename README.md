@@ -5,7 +5,7 @@ for calculating the power, sample size and minimum detectable effect of t-tests 
 
 To quote the documentation
 
-> Power analysis for AB testing. The calculations are based on the Welch's unequal variances t-test, which is generally preferred over the Student's t-test > when sample sizes and variances of the two groups are unequal, which is frequently the case in AB testing. In such situations, the Student's t-test will > give biased results due to using the pooled standard deviation, unlike the Welch's t-test.
+> Power analysis for AB testing. The calculations are based on the Welch's unequal variances t-test, which is generally preferred over the Student's t-test when sample sizes and variances of the two groups are unequal, which is frequently the case in AB testing. In such situations, the Student's t-test will give biased results due to using the pooled standard deviation, unlike the Welch's t-test.
 
 ## Quick Example
 
