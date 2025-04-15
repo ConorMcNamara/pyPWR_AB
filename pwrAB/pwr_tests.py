@@ -18,25 +18,25 @@ def ab_t2n(
 
     Parameters
     ----------
-    n: int, default=None
+    n : int, default=None
         Total number of observations (sum of observations for groups A and B)
-    percent_b: float, default=None
+    percent_b : float, default=None
         Percentage of total observations allocated to group B (between 0 and 1 - e.g. input 0.5 for 50%)
-    mean_diff: float, default=None
+    mean_diff : float, default=None
         Difference in means of the two groups, with mean_B - mean_A
-    sd_a: float, default=1
+    sd_a : float, default=1
         Standard deviation of group A
-    sd_b: float, default=1
+    sd_b : float, default=1
         Standard deviation of group B
-    sig_level: float, default=None
+    sig_level : float, default=None
         Significance level (Type I error probability)
-    power: float, default=None
+    power : float, default=None
         Power of test (1 minus Type II error probability)
-    alternative: {'two-sided', 'greater', 'less'}
+    alternative : {'two-sided', 'greater', 'less'}
         Character string specifying the alternative hypothesis
-    max_sample: int, default=1e07
+    max_sample : int, default=1e07
         Maximum sample size that is searched for
-    print_pretty: bool, default=True
+    print_pretty : bool, default=True
         Whether we want our results printed our not
 
     Returns
@@ -105,23 +105,23 @@ def ab_t2n_prop(
 
     Parameters
     ----------
-    prop_a: float,default=None
+    prop_a : float,default=None
         Proportion of successes in group A (between 0 and 1)
-    prop_b: float, default=None
+    prop_b : float, default=None
         Proportion of successes in group B (between 0 and 1)
-    n: int, default=None
+    n : int, default=None
         Total number of observations (sum of observations for groups A and B)
-    percent_b: float, default=None
+    percent_b : float, default=None
         Percentage of total observations allocated to group B (between 0 and 1 - e.g. input 0.5 for 50%)
-    sig_level: float, default=None
+    sig_level : float, default=None
         Significance level (Type I error probability)
-    power: float, default=None
+    power : float, default=None
         Power of test (1 minus Type II error probability)
-    alternative: {'two-sided', 'greater', 'less'}
+    alternative : {'two-sided', 'greater', 'less'}
         Character string specifying the alternative hypothesis
-    max_sample: int, default=1e07
+    max_sample : int, default=1e07
         Maximum sample size that is searched for
-    print_pretty: bool, default=True
+    print_pretty : bool, default=True
         Whether we want our results printed our not
 
     Returns
