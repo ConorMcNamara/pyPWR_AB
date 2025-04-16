@@ -167,7 +167,6 @@ class TestABProp_T2n:
         #           power = 0.8
         #     alternative = two_sided
         expected = [0.1580145, 0.2471605]
-
         np.testing.assert_allclose(prop_b_results, expected, atol=1e-04)
 
         prop_a_results = pwr_tests.ab_t2n_prop(prop_b=0.4, n=3_000, percent_b=0.3, power=0.8, sig_level=0.05,

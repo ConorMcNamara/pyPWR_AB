@@ -2,7 +2,7 @@ from math import pow, sqrt, ceil
 from typing import Union
 
 from scipy.stats import t as t_dist, nct
-from scipy.optimize import brentq, bisect, toms748
+from scipy.optimize import brentq, bisect, ridder
 
 import numpy as np
 
@@ -308,20 +308,20 @@ class ab_t2n_prop_class:
                     root_1 = brentq(self._get_prop_a, self.prop_b, 1)
                 except ValueError:
                     try:
-                        root_1 = bisect(self._get_prop_a, self.prop_b, 1)
+                        root_1 = brentq(self._get_prop_a, self.prop_b, 0.75)
                     except ValueError:
                         try:
-                            root_1 = toms748(self._get_prop_a, self.prop_b, 1)
+                            root_1 = brentq(self._get_prop_a, self.prop_b, 0.5)
                         except ValueError:
                             root_1 = None
                 try:
                     root_2 = brentq(self._get_prop_a, 0, self.prop_b)
                 except ValueError:
                     try:
-                        root_2 = bisect(self._get_prop_a, 0, self.prop_b)
+                        root_2 = brentq(self._get_prop_a, 0.1, self.prop_b)
                     except ValueError:
                         try:
-                            root_2 = toms748(self._get_prop_a, 0, self.prop_b)
+                            root_2 = brentq(self._get_prop_a, 0.2, self.prop_b)
                         except ValueError:
                             root_2 = None
                 if root_1 is not None:
@@ -341,25 +341,25 @@ class ab_t2n_prop_class:
                 self.prop_b = brentq(self._get_prop_b, self.prop_a, 1)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = bisect(self._get_prop_b, self.prop_a, 1)
+                    root_1 = ridder(self._get_prop_b, self.prop_a, 1)
                 except ValueError:
                     try:
-                        root_1 = brentq(self._get_prop_b, self.prop_a, 1)
+                        root_1 = ridder(self._get_prop_b, self.prop_a, 0.75)
                     except ValueError:
                         try:
-                            root_1 = toms748(self._get_prop_b, self.prop_a, 1)
+                            root_1 = ridder(self._get_prop_b, self.prop_a, 0.5)
                         except ValueError:
-                            root_1 = None
+                            root_1 =ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)
                 try:
-                    root_2 = bisect(self._get_prop_b, 0, self.prop_a)
+                    root_2 = ridder(self._get_prop_b, 0, self.prop_a)
                 except ValueError:
                     try:
-                        root_2 = brentq(self._get_prop_b, 0, self.prop_a)
+                        root_2 = ridder(self._get_prop_b, 0.1, self.prop_a)
                     except ValueError:
                         try:
-                            root_2 = toms748(self._get_prop_b, 0, self.prop_a)
+                            root_2 = ridder(self._get_prop_b, 0.2, self.prop_a)
                         except ValueError:
-                            root_2 = None
+                            root_2 = ridder(self._get_prop_b, self.prop_a - 0.1, self.prop_a)
                 if root_1 is not None:
                     self.prop_b = [root_2, root_1] if root_2 is not None else root_1
                 else:
