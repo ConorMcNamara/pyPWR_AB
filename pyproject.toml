@@ -1,15 +1,16 @@
 [project]
 name = "pypwr-ab"
-version = "0.1.0"
-description = ""
+version = "1.0.0"
+description = "Power analysis for Welch's T-Test of Unequal Variances"
 authors = [
     {name = "ConorMcNamara",email = "conor.s.mcnamara@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "numpy (>=2.2.3,<3.0.0)",
-    "pytest (>=8.3.5,<9.0.0)"
+    "pytest (>=8.3.5,<9.0.0)",
+    "scipy (>=1.15.2,<2.0.0)"
 ]
 
 

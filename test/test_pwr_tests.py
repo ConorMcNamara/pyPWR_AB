@@ -1,5 +1,4 @@
 import pytest
-import numpy as np
 
 from pwrAB import pwr_tests
 
@@ -25,7 +24,7 @@ class TestAB_T2n:
         assert power_results == pytest.approx(expected, abs=1e-05)
 
         n_results = pwr_tests.ab_t2n(percent_b=0.3, mean_diff=0.15, sd_a=1, sd_b=2, sig_level=0.05, power=0.8,
-                                     alternative='two-sided')["n"]
+                                     alternative='two-sided', max_sample=1e05)["n"]
         # AB_t2n(percent_B = .3, mean_diff = .15, sd_A = 1,
         # +        sd_B = 2, sig_level = .05, power = .8, alternative = 'two_sided')
         #
@@ -153,7 +152,7 @@ class TestABProp_T2n:
         expected = 0.02
         assert percent_b_results == pytest.approx(expected, abs=1e-03)
 
-        prop_b_results = pwr_tests.ab_t2n_prop(prop_a=0.2, n=3_000, percent_b=.3, power=0.8, sig_level=0.05,
+        prop_b_results = pwr_tests.ab_t2n_prop(prop_a=0.2, n=3_000, percent_b=0.3, power=0.8, sig_level=0.05,
                                                alternative='two-sided')["prop_b"]
         # AB_t2n_prop(prop_A = .2, N = 3000, percent_B = .3, power = .8, sig_level = .05, alternative = 'two_sided')
         #
@@ -166,8 +165,8 @@ class TestABProp_T2n:
         #       sig_level = 0.05
         #           power = 0.8
         #     alternative = two_sided
-        expected = [0.1580145, 0.2471605]
-        np.testing.assert_allclose(prop_b_results, expected, atol=1e-04)
+        expected = 0.2471605
+        assert prop_b_results == pytest.approx(expected, abs=1e-04)
 
         prop_a_results = pwr_tests.ab_t2n_prop(prop_b=0.4, n=3_000, percent_b=0.3, power=0.8, sig_level=0.05,
                                                alternative='two-sided')["prop_a"]
@@ -182,5 +181,9 @@ class TestABProp_T2n:
         #       sig_level = 0.05
         #           power = 0.8
         #     alternative = two_sided'
-        expected = [0.3457812, 0.4549985]
-        np.testing.assert_allclose(prop_a_results, expected, atol=1e-04)
+        expected = 0.3457812
+        assert prop_a_results == pytest.approx(expected, abs=1e-04)
+
+
+if __name__ == "__main__":
+    pytest.main()

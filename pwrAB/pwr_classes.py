@@ -1,7 +1,8 @@
 from math import pow, sqrt, ceil
+from typing import Union
 
 from scipy.stats import t as t_dist, nct
-from scipy.optimize import brentq, bisect
+from scipy.optimize import brentq, bisect, toms748, ridder
 
 import numpy as np
 
@@ -18,7 +19,7 @@ class ab_t2n_class:
             sig_level: float = None,
             power: float = None,
             alternative: str = "two-sided",
-            max_sample: int = 1e07,
+            max_sample: Union[int, float] = 1e07,
     ) -> None:
         self.n = n
         self.percent_b = percent_b
@@ -27,7 +28,7 @@ class ab_t2n_class:
         self.sig_level = sig_level
         self.power = power
         self.alternative = alternative.casefold()
-        self.max_sample = max_sample
+        self.max_sample = ceil(max_sample)
         self.mean_diff = abs(mean_diff) if self.alternative == "two-sided" else mean_diff
 
     def _get_power(self) -> float:
@@ -170,7 +171,10 @@ class ab_t2n_class:
             self.power = self._get_power()
         elif self.n is None:
             min_n = max((5 / self.percent_b), (5 / (1 - self.percent_b)))
-            self.n = ceil(bisect(self._get_n, min_n, self.max_sample + 1))
+            try:
+                self.n = ceil(bisect(self._get_n, min_n, self.max_sample + 1))
+            except ValueError:
+                self.n = ceil(bisect(self._get_n, min_n, self.max_sample / 10 + 1))
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
             search_grid = np.arange(min_percent_b, 1 - min_percent_b, 0.0001)
@@ -211,7 +215,7 @@ class ab_t2n_prop_class:
                  sig_level: float = None,
                  power: float = None,
                  alternative: str = "two-sided",
-                 max_sample: int = 1e+07
+                 max_sample: Union[int, float] = 1e+07
                  ) -> None:
         self.prop_a = prop_a
         self.prop_b = prop_b
@@ -302,12 +306,24 @@ class ab_t2n_prop_class:
             elif self.alternative == "two-sided":
                 try:
                     root_1 = brentq(self._get_prop_a, self.prop_b, 1)
-                except:
-                    pass
+                except ValueError:
+                    try:
+                        root_1 = bisect(self._get_prop_a, self.prop_b, 1)
+                    except ValueError:
+                        try:
+                            root_1 = toms748(self._get_prop_a, self.prop_b, 1)
+                        except ValueError:
+                            root_1 = None
                 try:
                     root_2 = brentq(self._get_prop_a, 0, self.prop_b)
-                except:
-                    pass
+                except ValueError:
+                    try:
+                        root_2 = bisect(self._get_prop_a, 0, self.prop_b)
+                    except ValueError:
+                        try:
+                            root_2 = toms748(self._get_prop_a, 0, self.prop_b)
+                        except ValueError:
+                            root_2 = None
                 if root_1 is not None:
                     if root_2 is not None:
                         self.prop_a = [root_2, root_1]
@@ -325,13 +341,25 @@ class ab_t2n_prop_class:
                 self.prop_b = brentq(self._get_prop_b, self.prop_a, 1)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = brentq(self._get_prop_b, self.prop_a, 1)
-                except:
-                    pass
+                    root_1 = bisect(self._get_prop_b, self.prop_a, 1)
+                except ValueError:
+                    try:
+                        root_1 = brentq(self._get_prop_b, self.prop_a, 1)
+                    except ValueError:
+                        try:
+                            root_1 = toms748(self._get_prop_b, self.prop_a, 1)
+                        except ValueError:
+                            root_1 = None
                 try:
-                    root_2 = brentq(self._get_prop_b, 0, self.prop_a)
-                except:
-                    pass
+                    root_2 = bisect(self._get_prop_b, 0, self.prop_a)
+                except ValueError:
+                    try:
+                        root_2 = brentq(self._get_prop_b, 0, self.prop_a)
+                    except ValueError:
+                        try:
+                            root_2 = toms748(self._get_prop_b, 0, self.prop_a)
+                        except ValueError:
+                            root_2 = None
                 if root_1 is not None:
                     self.prop_b = [root_2, root_1] if root_2 is not None else root_1
                 else:

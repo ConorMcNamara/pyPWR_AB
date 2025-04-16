@@ -1,3 +1,5 @@
+from typing import Union
+
 from pwrAB.pwr_classes import ab_t2n_class, ab_t2n_prop_class
 
 
@@ -10,7 +12,7 @@ def ab_t2n(
         sig_level: float = None,
         power: float = None,
         alternative: str = "two-sided",
-        max_sample: int = 1e07,
+        max_sample: Union[int, float] = 1e07,
         print_pretty: bool = True
 ) -> dict:
     """AB_t2n performs the power analysis for AB testing. It uses the Welch’s t-test, which allows for the standard
@@ -97,7 +99,7 @@ def ab_t2n_prop(
         sig_level: float = None,
         power: float = None,
         alternative: str = "two-sided",
-        max_sample: int = 1e+07,
+        max_sample: Union[int, float] = 1e+07,
         print_pretty: bool = True,
 ) -> dict:
     """AB_t2n_prop performs the power analysis for AB testing, and when dependent variables are proportions
