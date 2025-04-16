@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from pwrAB import pwr_tests
@@ -165,8 +166,9 @@ class TestABProp_T2n:
         #       sig_level = 0.05
         #           power = 0.8
         #     alternative = two_sided
-        expected = 0.2471605
-        assert prop_b_results == pytest.approx(expected, abs=1e-04)
+        expected = [0.1580145, 0.2471605]
+
+        np.testing.assert_allclose(prop_b_results, expected, atol=1e-04)
 
         prop_a_results = pwr_tests.ab_t2n_prop(prop_b=0.4, n=3_000, percent_b=0.3, power=0.8, sig_level=0.05,
                                                alternative='two-sided')["prop_a"]
@@ -181,8 +183,8 @@ class TestABProp_T2n:
         #       sig_level = 0.05
         #           power = 0.8
         #     alternative = two_sided'
-        expected = 0.3457812
-        assert prop_a_results == pytest.approx(expected, abs=1e-04)
+        expected = [0.3457812, 0.4549985]
+        np.testing.assert_allclose(prop_a_results, expected, atol=1e-04)
 
 
 if __name__ == "__main__":
