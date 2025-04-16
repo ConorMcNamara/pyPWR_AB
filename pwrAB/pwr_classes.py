@@ -2,7 +2,7 @@ from math import pow, sqrt, ceil
 from typing import Union
 
 from scipy.stats import t as t_dist, nct
-from scipy.optimize import brentq, bisect, toms748, ridder
+from scipy.optimize import brentq, bisect, toms748
 
 import numpy as np
 
