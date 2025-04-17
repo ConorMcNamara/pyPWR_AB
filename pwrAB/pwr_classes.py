@@ -7,19 +7,19 @@ from scipy.optimize import brentq, bisect, ridder
 import numpy as np
 
 
-## Continuous Class
+# Continuous Class
 class ab_t2n_class:
     def __init__(
-            self,
-            n: int = None,
-            percent_b: float = None,
-            mean_diff: float = None,
-            sd_a: float = 1,
-            sd_b: float = 1,
-            sig_level: float = None,
-            power: float = None,
-            alternative: str = "two-sided",
-            max_sample: Union[int, float] = 1e07,
+        self,
+        n: int = None,
+        percent_b: float = None,
+        mean_diff: float = None,
+        sd_a: float = 1,
+        sd_b: float = 1,
+        sig_level: float = None,
+        power: float = None,
+        alternative: str = "two-sided",
+        max_sample: Union[int, float] = 1e07,
     ) -> None:
         self.n = n
         self.percent_b = percent_b
@@ -35,19 +35,14 @@ class ab_t2n_class:
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
         df_ws = pow(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
-                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
         )
-        t_stat = self.mean_diff / sqrt(
-            pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b
-        )
+        t_stat = self.mean_diff / sqrt(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b)
         if self.alternative == "less":
             power = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
         elif self.alternative == "two-sided":
             qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            power = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(
-                -qu, df=df_ws, nc=t_stat
-            )
+            power = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat)
         else:
             power = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
         return power
@@ -56,114 +51,64 @@ class ab_t2n_class:
         n_b = n * self.percent_b
         n_a = n - n_b
         df_ws = pow(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
-                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
         )
-        t_stat = self.mean_diff / sqrt(
-            pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b
-        )
+        t_stat = self.mean_diff / sqrt(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b)
         if self.alternative == "less":
-            n = (
-                    nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            n = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         elif self.alternative == "two-sided":
             qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            n = (
-                    nct.sf(qu, df=df_ws, nc=t_stat)
-                    + nct.cdf(-qu, df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            n = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
-            n = (
-                    nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            n = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         return n
 
     def _get_percent_b(self, percent_b: float) -> float:
         n_b = self.n * percent_b
         n_a = self.n - n_b
         df_ws = pow(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
-                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
         )
-        t_stat = self.mean_diff / sqrt(
-            pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b
-        )
+        t_stat = self.mean_diff / sqrt(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b)
         if self.alternative == "less":
-            percent_b = (
-                    nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            percent_b = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         elif self.alternative == "two-sided":
             qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            percent_b = (
-                    nct.sf(qu, df=df_ws, nc=t_stat)
-                    + nct.cdf(-qu, df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            percent_b = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
-            percent_b = (
-                    nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            percent_b = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         return percent_b
 
     def _get_mean_diff(self, mean_diff: float) -> float:
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
         df_ws = pow(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
-                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
         )
         t_stat = mean_diff / sqrt(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b)
         if self.alternative == "less":
-            mean_diff = (
-                    nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            mean_diff = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         elif self.alternative == "two-sided":
             qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            mean_diff = (
-                    nct.sf(qu, df=df_ws, nc=t_stat)
-                    + nct.cdf(-qu, df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            mean_diff = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
-            mean_diff = (
-                    nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            mean_diff = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         return mean_diff
 
     def _get_sig_level(self, sig_level) -> float:
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
         df_ws = pow(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
-                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
         )
-        t_stat = self.mean_diff / sqrt(
-            pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b
-        )
+        t_stat = self.mean_diff / sqrt(pow(self.sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b)
         if self.alternative == "less":
-            sig_level = (
-                    nct.cdf(t_dist.ppf(sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            sig_level = nct.cdf(t_dist.ppf(sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         elif self.alternative == "two-sided":
             qu = t_dist.isf(sig_level / 2, df=df_ws)
-            sig_level = (
-                    nct.sf(qu, df=df_ws, nc=t_stat)
-                    + nct.cdf(-qu, df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            sig_level = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
-            sig_level = (
-                    nct.sf(t_dist.isf(sig_level, df=df_ws), df=df_ws, nc=t_stat)
-                    - self.power
-            )
+            sig_level = nct.sf(t_dist.isf(sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         return sig_level
 
     def pwr_test(self) -> dict:
@@ -188,9 +133,7 @@ class ab_t2n_class:
         elif self.sig_level is None:
             self.sig_level = brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
         else:
-            raise ValueError(
-                "One of power, n, percent_b, mean_diff or sig_level must be None"
-            )
+            raise ValueError("One of power, n, percent_b, mean_diff or sig_level must be None")
         return {
             "n": self.n,
             "percent_b": self.percent_b,
@@ -204,19 +147,19 @@ class ab_t2n_class:
         }
 
 
-## Proportion Class
+# Proportion Class
 class ab_t2n_prop_class:
-
-    def __init__(self,
-                 prop_a: float = None,
-                 prop_b: float = None,
-                 n: int = None,
-                 percent_b: float = None,
-                 sig_level: float = None,
-                 power: float = None,
-                 alternative: str = "two-sided",
-                 max_sample: Union[int, float] = 1e+07
-                 ) -> None:
+    def __init__(
+        self,
+        prop_a: float = None,
+        prop_b: float = None,
+        n: int = None,
+        percent_b: float = None,
+        sig_level: float = None,
+        power: float = None,
+        alternative: str = "two-sided",
+        max_sample: Union[int, float] = 1e07,
+    ) -> None:
         self.prop_a = prop_a
         self.prop_b = prop_b
         self.n = n
@@ -233,20 +176,56 @@ class ab_t2n_prop_class:
         self.sd_b = sqrt(prop_b * (1 - prop_b)) if prop_b is not None else None
 
     def _get_power(self) -> float:
-        return ab_t2n_class(self.n, self.percent_b, self.mean_diff, self.sd_a, self.sd_b, self.sig_level, self.power,
-                            self.alternative, self.max_sample)._get_power()
+        return ab_t2n_class(
+            self.n,
+            self.percent_b,
+            self.mean_diff,
+            self.sd_a,
+            self.sd_b,
+            self.sig_level,
+            self.power,
+            self.alternative,
+            self.max_sample,
+        )._get_power()
 
     def _get_n(self, n: int) -> float:
-        return ab_t2n_class(self.n, self.percent_b, self.mean_diff, self.sd_a, self.sd_b, self.sig_level, self.power,
-                            self.alternative, self.max_sample)._get_n(n)
+        return ab_t2n_class(
+            self.n,
+            self.percent_b,
+            self.mean_diff,
+            self.sd_a,
+            self.sd_b,
+            self.sig_level,
+            self.power,
+            self.alternative,
+            self.max_sample,
+        )._get_n(n)
 
     def _get_percent_b(self, percent_b: float) -> float:
-        return ab_t2n_class(self.n, self.percent_b, self.mean_diff, self.sd_a, self.sd_b, self.sig_level, self.power,
-                            self.alternative, self.max_sample)._get_percent_b(percent_b)
+        return ab_t2n_class(
+            self.n,
+            self.percent_b,
+            self.mean_diff,
+            self.sd_a,
+            self.sd_b,
+            self.sig_level,
+            self.power,
+            self.alternative,
+            self.max_sample,
+        )._get_percent_b(percent_b)
 
     def _get_sig_level(self, sig_level) -> float:
-        return ab_t2n_class(self.n, self.percent_b, self.mean_diff, self.sd_a, self.sd_b, self.sig_level, self.power,
-                            self.alternative, self.max_sample)._get_sig_level(sig_level)
+        return ab_t2n_class(
+            self.n,
+            self.percent_b,
+            self.mean_diff,
+            self.sd_a,
+            self.sd_b,
+            self.sig_level,
+            self.power,
+            self.alternative,
+            self.max_sample,
+        )._get_sig_level(sig_level)
 
     def _get_prop_a(self, prop_a: float) -> float:
         mean_diff = abs(self.prop_b - prop_a) if self.alternative == "two-sided" else self.prop_b - prop_a
@@ -254,19 +233,14 @@ class ab_t2n_prop_class:
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
         df_ws = pow(pow(sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
-                pow(pow(sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
         )
-        t_stat = mean_diff / sqrt(
-            pow(sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b
-        )
+        t_stat = mean_diff / sqrt(pow(sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b)
         if self.alternative == "less":
             prop_a = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         elif self.alternative == "two-sided":
             qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            prop_a = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(
-                -qu, df=df_ws, nc=t_stat
-            ) - self.power
+            prop_a = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
             prop_a = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         return prop_a
@@ -277,19 +251,14 @@ class ab_t2n_prop_class:
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
         df_ws = pow(pow(self.sd_a, 2) / n_a + pow(sd_b, 2) / n_b, 2) / (
-                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
-                + pow(pow(sd_b, 2) / n_b, 2) / (n_b - 1)
+            pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1) + pow(pow(sd_b, 2) / n_b, 2) / (n_b - 1)
         )
-        t_stat = mean_diff / sqrt(
-            pow(self.sd_a, 2) / n_a + pow(sd_b, 2) / n_b
-        )
+        t_stat = mean_diff / sqrt(pow(self.sd_a, 2) / n_a + pow(sd_b, 2) / n_b)
         if self.alternative == "less":
             prop_b = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         elif self.alternative == "two-sided":
             qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            prop_b = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(
-                -qu, df=df_ws, nc=t_stat
-            ) - self.power
+            prop_b = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
             prop_b = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
         return prop_b
@@ -349,7 +318,7 @@ class ab_t2n_prop_class:
                         try:
                             root_1 = ridder(self._get_prop_b, self.prop_a, 0.5)
                         except ValueError:
-                            root_1 =ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)
+                            root_1 = ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)
                 try:
                     root_2 = ridder(self._get_prop_b, 0, self.prop_a)
                 except ValueError:
@@ -374,9 +343,7 @@ class ab_t2n_prop_class:
         elif self.sig_level is None:
             self.sig_level = brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
         else:
-            raise ValueError(
-                "One of power, n, percent_b, prop_a, pro_b or sig_level must be None"
-            )
+            raise ValueError("One of power, n, percent_b, prop_a, pro_b or sig_level must be None")
         return {
             "n": self.n,
             "percent_b": self.percent_b,

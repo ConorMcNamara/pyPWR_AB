@@ -4,16 +4,16 @@ from pwrAB.pwr_classes import ab_t2n_class, ab_t2n_prop_class
 
 
 def ab_t2n(
-        n: int = None,
-        percent_b: float = None,
-        mean_diff: float = None,
-        sd_a: float = 1,
-        sd_b: float = 1,
-        sig_level: float = None,
-        power: float = None,
-        alternative: str = "two-sided",
-        max_sample: Union[int, float] = 1e07,
-        print_pretty: bool = True
+    n: int = None,
+    percent_b: float = None,
+    mean_diff: float = None,
+    sd_a: float = 1,
+    sd_b: float = 1,
+    sig_level: float = None,
+    power: float = None,
+    alternative: str = "two-sided",
+    max_sample: Union[int, float] = 1e07,
+    print_pretty: bool = True,
 ) -> dict:
     """AB_t2n performs the power analysis for AB testing. It uses the Welch’s t-test, which allows for the standard
     deviation to vary across groups.
@@ -46,9 +46,7 @@ def ab_t2n(
     A dictionary containing n, percent_b, mean_diff, power and the sig_level of a t-test
     """
     if not any(v is None for v in [n, percent_b, mean_diff, power, sig_level]):
-        raise ValueError(
-            "At least one of n, percent_b, mean_diff, power, and sig_level must be None"
-        )
+        raise ValueError("At least one of n, percent_b, mean_diff, power, and sig_level must be None")
     if sum([v is None for v in [n, percent_b, mean_diff, power, sig_level]]) > 1:
         raise ValueError("Exactly one of n, percent_b, mean_diff, power, and sig_level may be None")
     if sd_a is None or sd_b is None:
@@ -62,8 +60,8 @@ def ab_t2n(
     test = ab_t2n_class(n, percent_b, mean_diff, sd_a, sd_b, sig_level, power, alternative, max_sample).pwr_test()
     if print_pretty:
         print(
-            " " * 2 +
-            f"{test['method']}"
+            " " * 2
+            + f"{test['method']}"
             + "\n" * 2
             + " " * 10
             + f"N = {test['n']}"
@@ -92,15 +90,15 @@ def ab_t2n(
 
 
 def ab_t2n_prop(
-        prop_a: float = None,
-        prop_b: float = None,
-        n: int = None,
-        percent_b: float = None,
-        sig_level: float = None,
-        power: float = None,
-        alternative: str = "two-sided",
-        max_sample: Union[int, float] = 1e+07,
-        print_pretty: bool = True,
+    prop_a: float = None,
+    prop_b: float = None,
+    n: int = None,
+    percent_b: float = None,
+    sig_level: float = None,
+    power: float = None,
+    alternative: str = "two-sided",
+    max_sample: Union[int, float] = 1e07,
+    print_pretty: bool = True,
 ) -> dict:
     """AB_t2n_prop performs the power analysis for AB testing, and when dependent variables are proportions
     (between 0 and 1). It uses the Welch’s t-test, which allows for the standard deviation to vary across groups.
@@ -131,9 +129,7 @@ def ab_t2n_prop(
     A dictionary containing prop_a, prop_b, n, percent_b, sig_level and power of our test
     """
     if not any(v is None for v in [n, percent_b, prop_a, prop_b, power, sig_level]):
-        raise ValueError(
-            "At least one of n, percent_b, prop_a, prop_b, power, and sig_level must be None"
-        )
+        raise ValueError("At least one of n, percent_b, prop_a, prop_b, power, and sig_level must be None")
     if sum([v is None for v in [n, percent_b, prop_a, prop_b, power, sig_level]]) > 1:
         raise ValueError("Exactly one of n, percent_b, prop_a, prop_b, power, and sig_level may be None")
     if sig_level is not None and (sig_level < 0 or sig_level > 1):
@@ -147,8 +143,8 @@ def ab_t2n_prop(
         prop_a = [round(i, 4) for i in test["prop_a"]] if isinstance(test["prop_a"], list) else test["prop_a"]
         prop_b = [round(i, 4) for i in test["prop_b"]] if isinstance(test["prop_b"], list) else test["prop_b"]
         print(
-            " " * 2 +
-            f"{test['method']}"
+            " " * 2
+            + f"{test['method']}"
             + "\n" * 2
             + " " * 10
             + f"N = {test['n']}"
