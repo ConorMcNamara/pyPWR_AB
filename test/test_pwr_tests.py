@@ -260,30 +260,31 @@ class TestABPropT2n:
         expected = [0.1580145, 0.2471605]
         np.testing.assert_allclose(prop_b_results, expected, atol=1e-04)
 
+
 @staticmethod
 def test_prop_a_results() -> None:
-        prop_a_results = pwr_tests.ab_t2n_prop(
-            prop_b=0.4,
-            n=3_000,
-            percent_b=0.3,
-            power=0.8,
-            sig_level=0.05,
-            alternative="two-sided",
-            print_pretty=False,
-        )["prop_a"]
-        # AB_t2n_prop(prop_B = .4, N = 3000, percent_B = .3, power = .8, sig_level = .05, alternative = 'two_sided')
-        #
-        #      t-test Power Calculation
-        #
-        #               N = 3000
-        #       percent_B = 0.3
-        #          prop_A = 0.3457812, 0.4549985
-        #          prop_B = 0.4
-        #       sig_level = 0.05
-        #           power = 0.8
-        #     alternative = two_sided'
-        expected = [0.3457812, 0.4549985]
-        np.testing.assert_allclose(prop_a_results, expected, atol=1e-04)
+    prop_a_results = pwr_tests.ab_t2n_prop(
+        prop_b=0.4,
+        n=3_000,
+        percent_b=0.3,
+        power=0.8,
+        sig_level=0.05,
+        alternative="two-sided",
+        print_pretty=False,
+    )["prop_a"]
+    # AB_t2n_prop(prop_B = .4, N = 3000, percent_B = .3, power = .8, sig_level = .05, alternative = 'two_sided')
+    #
+    #      t-test Power Calculation
+    #
+    #               N = 3000
+    #       percent_B = 0.3
+    #          prop_A = 0.3457812, 0.4549985
+    #          prop_B = 0.4
+    #       sig_level = 0.05
+    #           power = 0.8
+    #     alternative = two_sided'
+    expected = [0.3457812, 0.4549985]
+    np.testing.assert_allclose(prop_a_results, expected, atol=1e-04)
 
 
 if __name__ == "__main__":
