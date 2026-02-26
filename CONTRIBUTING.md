@@ -41,7 +41,7 @@ We welcome many types of contributions:
 
 ### Prerequisites
 
-- Python 3.10 or higher
+- Python 3.13 or higher
 - Git
 - (Optional) Poetry for dependency management
 
@@ -131,7 +131,7 @@ Power should be approximately 0.85
 Power is 0.15
 
 ### Environment
-- Python 3.11
+- Python 3.14
 - pypwr-ab 1.0.0
 - macOS 14.0
 ```

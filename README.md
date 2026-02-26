@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/ConorMcNamara/pyPWR_AB/actions/workflows/python-package.yml/badge.svg)](https://github.com/ConorMcNamara/pyPWR_AB/actions/workflows/python-package.yml)
 [![Code Quality](https://github.com/ConorMcNamara/pyPWR_AB/actions/workflows/linter.yml/badge.svg)](https://github.com/ConorMcNamara/pyPWR_AB/actions/workflows/linter.yml)
-[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.13%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+- **Python version requirement increased**: Now requires Python 3.13+ (previously 3.10+)
+- CI/CD workflows updated to test only Python 3.13 and 3.14
+
 ### Added
 - Comprehensive project documentation (CONTRIBUTING.md, MANIFEST.in, Makefile)
 - Pre-commit hooks configuration with ruff, mypy, and standard checks
@@ -16,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Professional README with badges, examples, and complete documentation
 
 ### Changed
-- Modernized type hints to use Python 3.10+ syntax (`int | None` instead of `Union[int, None]`)
+- Modernized type hints to use Python 3.13+ syntax (`int | None` instead of `Union[int, None]`)
 - Updated all imports to use `from __future__ import annotations`
 - Improved error messages with more descriptive, formatted strings
 - Enhanced pyproject.toml with complete project metadata and modern build configuration
@@ -82,7 +86,7 @@ First stable release of pyPWR_AB, a Python port of the R pwrAB package.
 - Clean, typed API following modern Python best practices
 
 **Compatibility:**
-- Python 3.10+
+- Python 3.13+
 - NumPy 2.2.3+
 - SciPy 1.15.2+
 

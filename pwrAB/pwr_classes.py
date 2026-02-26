@@ -262,7 +262,7 @@ class ab_t2n_prop_class:
             self.max_sample,
         )._get_sig_level(sig_level)
 
-    def _get_prop_a(self, prop_a: float) -> float:
+    def _get_prop_a(self, prop_a: float) -> np.array:
         """Calculate power difference for given prop_a (root finding helper)."""
         mean_diff = abs(self.prop_b - prop_a) if self.alternative == "two-sided" else self.prop_b - prop_a  # type: ignore[operator]
         sd_a = sqrt(prop_a * (1 - prop_a))
@@ -282,9 +282,9 @@ class ab_t2n_prop_class:
             result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
             result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return float(result)
+        return np.array(result)
 
-    def _get_prop_b(self, prop_b: float) -> float:
+    def _get_prop_b(self, prop_b: float) -> np.array:
         """Calculate power difference for given prop_b (root finding helper)."""
         mean_diff = abs(prop_b - self.prop_a) if self.alternative == "two-sided" else prop_b - self.prop_a  # type: ignore[operator]
         sd_b = sqrt(prop_b * (1 - prop_b))
@@ -304,7 +304,7 @@ class ab_t2n_prop_class:
             result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
             result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return float(result)
+        return np.array(result)
 
     def pwr_test(self) -> dict[str, Any]:
         """
