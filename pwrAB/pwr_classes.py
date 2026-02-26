@@ -326,15 +326,18 @@ class ab_t2n_prop_class:
                 self.prop_a = brentq(self._get_prop_a, self.prop_b, 1)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = toms748(self._get_prop_a, self.prop_b, 1)
+                    root_1 = bisect(self._get_prop_a, self.prop_b, 1)
                 except ValueError:
                     try:
-                        root_1 = toms748(self._get_prop_a, self.prop_b, 0.75)
+                        root_1 = bisect(self._get_prop_a, self.prop_b, 0.75)
                     except ValueError:
                         try:
-                            root_1 = toms748(self._get_prop_a, self.prop_b, 0.5)
+                            root_1 = bisect(self._get_prop_a, self.prop_b, 0.5)
                         except ValueError:
-                            root_1 = None
+                            try:
+                                root_1 = bisect(self._get_prop_a, self.prop_b, 0.25)
+                            except ValueError:
+                                root_1 = None
                 try:
                     root_2 = toms748(self._get_prop_a, 0, self.prop_b)
                 except ValueError:
