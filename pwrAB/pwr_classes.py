@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import ceil, sqrt
+from math import ceil, pow, sqrt
 from typing import Any
 
 import numpy as np
@@ -268,12 +268,13 @@ class ab_t2n_prop_class:
         sd_a = sqrt(prop_a * (1 - prop_a))
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
-        var_a = sd_a**2
-        var_b = self.sd_b**2
-        pooled_var = var_a / n_a + var_b / n_b
-
-        df_ws = pooled_var**2 / ((var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1))
-        t_stat = mean_diff / sqrt(pooled_var)
+        df_ws = pow(pow(sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b, 2) / (
+                pow(pow(sd_a, 2) / n_a, 2) / (n_a - 1)
+                + pow(pow(self.sd_b, 2) / n_b, 2) / (n_b - 1)
+        )
+        t_stat = mean_diff / sqrt(
+            pow(sd_a, 2) / n_a + pow(self.sd_b, 2) / n_b
+        )
 
         if self.alternative == "less":
             result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
@@ -290,12 +291,13 @@ class ab_t2n_prop_class:
         sd_b = sqrt(prop_b * (1 - prop_b))
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
-        var_a = self.sd_a**2
-        var_b = sd_b**2
-        pooled_var = var_a / n_a + var_b / n_b
-
-        df_ws = pooled_var**2 / ((var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1))
-        t_stat = mean_diff / sqrt(pooled_var)
+        df_ws = pow(pow(self.sd_a, 2) / n_a + pow(sd_b, 2) / n_b, 2) / (
+                pow(pow(self.sd_a, 2) / n_a, 2) / (n_a - 1)
+                + pow(pow(sd_b, 2) / n_b, 2) / (n_b - 1)
+        )
+        t_stat = mean_diff / sqrt(
+            pow(self.sd_a, 2) / n_a + pow(sd_b, 2) / n_b
+        )
 
         if self.alternative == "less":
             result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
