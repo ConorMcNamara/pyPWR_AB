@@ -37,6 +37,8 @@ class TestABT2n:
         expected = 0.5700792
         assert power_results == pytest.approx(expected, abs=1e-05)
 
+    @staticmethod
+    def test_n_results() -> None:
         n_results = pwr_tests.ab_t2n(
             percent_b=0.3,
             mean_diff=0.15,
@@ -64,6 +66,8 @@ class TestABT2n:
         expected = 5_155
         assert n_results == expected
 
+    @staticmethod
+    def test_mean_diff_results() -> None:
         mean_diff_results = pwr_tests.ab_t2n(
             n=3_000,
             percent_b=0.3,
@@ -90,6 +94,8 @@ class TestABT2n:
         expected = -0.1745265
         assert mean_diff_results == pytest.approx(expected, abs=1e-05)
 
+    @staticmethod
+    def test_sig_level_results() -> None:
         sig_level_results = pwr_tests.ab_t2n(
             n=1500,
             percent_b=0.3,
@@ -116,6 +122,8 @@ class TestABT2n:
         expected = 0.01477979
         assert sig_level_results == pytest.approx(expected, abs=1e-05)
 
+    @staticmethod
+    def test_percent_b_results() -> None:
         percent_b_results = pwr_tests.ab_t2n(
             n=1500,
             mean_diff=0.3,
@@ -173,6 +181,8 @@ class TestABPropT2n:
         expected = 0.8419403
         assert power_results == pytest.approx(expected, abs=1e-05)
 
+    @staticmethod
+    def test_n_results() -> None:
         n_results = pwr_tests.ab_t2n_prop(
             prop_a=0.8,
             prop_b=0.5,
@@ -198,6 +208,8 @@ class TestABPropT2n:
         expected = 76
         assert n_results == expected
 
+    @staticmethod
+    def test_percent_b_results() -> None:
         percent_b_results = pwr_tests.ab_t2n_prop(
             prop_a=0.4,
             prop_b=0.8,
@@ -223,6 +235,8 @@ class TestABPropT2n:
         expected = 0.02
         assert percent_b_results == pytest.approx(expected, abs=1e-03)
 
+    @staticmethod
+    def test_prop_b_results() -> None:
         prop_b_results = pwr_tests.ab_t2n_prop(
             prop_a=0.2,
             n=3_000,
@@ -246,6 +260,8 @@ class TestABPropT2n:
         expected = [0.1580145, 0.2471605]
         np.testing.assert_allclose(prop_b_results, expected, atol=1e-04)
 
+@staticmethod
+def test_prop_a_results() -> None:
         prop_a_results = pwr_tests.ab_t2n_prop(
             prop_b=0.4,
             n=3_000,
