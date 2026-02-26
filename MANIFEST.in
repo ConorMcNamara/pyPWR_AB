@@ -1,0 +1,40 @@
+# Include documentation files
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+
+# Include configuration files
+include pyproject.toml
+include .pre-commit-config.yaml
+
+# Include type stub marker
+include pwrAB/py.typed
+
+# Include test files
+recursive-include test *.py
+
+# Exclude common unnecessary files
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *$py.class
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude *.swp
+global-exclude *.swo
+
+# Exclude development and CI files
+exclude .gitignore
+exclude .gitattributes
+exclude Makefile
+exclude poetry.lock
+recursive-exclude .github *
+recursive-exclude .venv *
+recursive-exclude venv *
+recursive-exclude .pytest_cache *
+recursive-exclude .mypy_cache *
+recursive-exclude .ruff_cache *
+recursive-exclude htmlcov *
+recursive-exclude dist *
+recursive-exclude build *
+recursive-exclude *.egg-info *

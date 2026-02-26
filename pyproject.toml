@@ -3,32 +3,184 @@ name = "pypwr-ab"
 version = "1.0.0"
 description = "Power analysis for Welch's T-Test of Unequal Variances"
 authors = [
-    {name = "ConorMcNamara",email = "conor.s.mcnamara@gmail.com"}
+    {name = "ConorMcNamara", email = "conor.s.mcnamara@gmail.com"}
+]
+maintainers = [
+    {name = "ConorMcNamara", email = "conor.s.mcnamara@gmail.com"}
 ]
 readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.10"
+keywords = ["statistics", "power-analysis", "ab-testing", "welch-t-test", "sample-size"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 dependencies = [
-    "numpy (>=2.2.3,<3.0.0)",
-    "pytest (>=8.3.5,<9.0.0)",
-    "scipy (>=1.15.2,<2.0.0)"
+    "numpy>=2.2.3,<3.0.0",
+    "scipy>=1.15.2,<2.0.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.5,<9.0.0",
+    "pytest-cov>=6.0.0",
+    "mypy>=1.13.0",
+    "ruff>=0.8.0",
+    "pre-commit>=4.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/ConorMcNamara/pyPWR_AB"
+Repository = "https://github.com/ConorMcNamara/pyPWR_AB"
+Issues = "https://github.com/ConorMcNamara/pyPWR_AB/issues"
+Documentation = "https://github.com/ConorMcNamara/pyPWR_AB#readme"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-pythonpath = [
-  ".", "pwrAB",
+pythonpath = [".", "pwrAB"]
+testpaths = ["test"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+    "-ra",
 ]
+xfail_strict = true
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["pwrAB"]
+branch = true
+parallel = true
+omit = [
+    "test/*",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.mypy]
+python_version = "3.10"
+# Core type checking
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = false  # Allow type: ignore comments without warnings
+warn_no_return = true
+strict_equality = true
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+
+# Pragmatic settings for scientific computing
+disallow_any_generics = false  # NumPy/SciPy use generics extensively
+disallow_subclassing_any = false
+disallow_untyped_calls = false  # SciPy functions aren't fully typed
+disallow_untyped_decorators = false
+strict_optional = false  # Allow None in operations where logic ensures safety
+
+[[tool.mypy.overrides]]
+module = "scipy.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "numpy.*"
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 120
 indent-width = 4
+target-version = "py310"
+extend-exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "TCH",    # flake8-type-checking
+    "RUF",    # ruff-specific rules
+    "ANN",    # flake8-annotations
+    "ASYNC",  # flake8-async
+    "A",      # flake8-builtins
+    "PTH",    # flake8-use-pathlib
+    "PL",     # pylint
+]
+ignore = [
+    "PLR0913", # too-many-arguments
+    "PLR2004", # magic-value-comparison
+]
+
+[tool.ruff.lint.per-file-ignores]
+"test/**/*.py" = [
+    "ANN",     # type annotations not required in tests
+    "PLR2004", # magic values OK in tests
+]
+"pwrAB/__init__.py" = [
+    "N999",    # Module name is valid for this package
+]
+"pwrAB/pwr_classes.py" = [
+    "N801",    # Class names follow R package convention for backwards compatibility
+    "PLR0912", # pwr_test methods are inherently complex due to multiple solve cases
+    "PLR0915", # pwr_test methods need many statements for comprehensive parameter handling
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pwrAB"]
+force-single-line = false
+lines-after-imports = 2

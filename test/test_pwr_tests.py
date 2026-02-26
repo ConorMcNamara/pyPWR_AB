@@ -1,16 +1,29 @@
+from __future__ import annotations
+
 import numpy as np
 import pytest
 
 from pwrAB import pwr_tests
 
 
-class TestAB_T2n:
+class TestABT2n:
+    """Test suite for ab_t2n function."""
+
     @staticmethod
     def test_power_results() -> None:
+        """Test power calculation with known parameters."""
         power_results = pwr_tests.ab_t2n(
-            n=3000, percent_b=0.3, mean_diff=0.15, sd_a=1, sd_b=2, sig_level=0.05, alternative="two-sided"
+            n=3000,
+            percent_b=0.3,
+            mean_diff=0.15,
+            sd_a=1,
+            sd_b=2,
+            sig_level=0.05,
+            alternative="two-sided",
+            print_pretty=False,
         )["power"]
-        # AB_t2n(N = 3000, percent_B = .3, mean_diff = .15, sd_A = 1, sd_B = 2, sig_level = .05, alternative = 'two_sided')
+        # AB_t2n(N = 3000, percent_B = .3, mean_diff = .15, sd_A = 1, sd_B = 2,
+        #        sig_level = .05, alternative = 'two_sided')
         #      t-test Power Calculation
         #
         #               N = 3000
@@ -33,6 +46,7 @@ class TestAB_T2n:
             power=0.8,
             alternative="two-sided",
             max_sample=1e05,
+            print_pretty=False,
         )["n"]
         # AB_t2n(percent_B = .3, mean_diff = .15, sd_A = 1,
         # +        sd_B = 2, sig_level = .05, power = .8, alternative = 'two_sided')
@@ -51,7 +65,14 @@ class TestAB_T2n:
         assert n_results == expected
 
         mean_diff_results = pwr_tests.ab_t2n(
-            n=3_000, percent_b=0.3, sd_a=1, sd_b=2, sig_level=0.05, power=0.8, alternative="less"
+            n=3_000,
+            percent_b=0.3,
+            sd_a=1,
+            sd_b=2,
+            sig_level=0.05,
+            power=0.8,
+            alternative="less",
+            print_pretty=False,
         )["mean_diff"]
         # AB_t2n(N = 3000, percent_B = .3, sd_A = 1,
         # +        sd_B = 2, sig_level = .05, power = .8, alternative = 'less')
@@ -70,7 +91,14 @@ class TestAB_T2n:
         assert mean_diff_results == pytest.approx(expected, abs=1e-05)
 
         sig_level_results = pwr_tests.ab_t2n(
-            n=1500, percent_b=0.3, mean_diff=0.3, sd_a=1, sd_b=2, power=0.8, alternative="greater"
+            n=1500,
+            percent_b=0.3,
+            mean_diff=0.3,
+            sd_a=1,
+            sd_b=2,
+            power=0.8,
+            alternative="greater",
+            print_pretty=False,
         )["sig_level"]
         # AB_t2n(N = 1500, percent_B = .3, mean_diff = 0.3, sd_A = 1,
         # +        sd_B = 2, power = .8, alternative = 'greater')
@@ -89,7 +117,14 @@ class TestAB_T2n:
         assert sig_level_results == pytest.approx(expected, abs=1e-05)
 
         percent_b_results = pwr_tests.ab_t2n(
-            n=1500, mean_diff=0.3, sd_a=1, sd_b=2, sig_level=0.10, power=0.8, alternative="two-sided"
+            n=1500,
+            mean_diff=0.3,
+            sd_a=1,
+            sd_b=2,
+            sig_level=0.10,
+            power=0.8,
+            alternative="two-sided",
+            print_pretty=False,
         )["percent_b"]
         # AB_t2n(N = 1500, mean_diff = 0.3, sd_A = 1,
         # +        sd_B = 2, sig_level = 0.10, power = .8, alternative = 'two_sided')
@@ -108,11 +143,20 @@ class TestAB_T2n:
         assert percent_b_results == pytest.approx(expected, abs=1e-05)
 
 
-class TestABProp_T2n:
+class TestABPropT2n:
+    """Test suite for ab_t2n_prop function."""
+
     @staticmethod
     def test_power_results() -> None:
+        """Test power calculation with proportion parameters."""
         power_results = pwr_tests.ab_t2n_prop(
-            prop_a=0.2, prop_b=0.25, n=3_000, percent_b=0.3, sig_level=0.05, alternative="two-sided"
+            prop_a=0.2,
+            prop_b=0.25,
+            n=3_000,
+            percent_b=0.3,
+            sig_level=0.05,
+            alternative="two-sided",
+            print_pretty=False,
         )["power"]
         # AB_t2n_prop(prop_A = .2, prop_B = .25, N = 3000, percent_B = .3,
         # +             sig_level = .05, alternative = 'two_sided')
@@ -130,7 +174,14 @@ class TestABProp_T2n:
         assert power_results == pytest.approx(expected, abs=1e-05)
 
         n_results = pwr_tests.ab_t2n_prop(
-            prop_a=0.8, prop_b=0.5, n=None, percent_b=0.3, power=0.8, sig_level=0.05, alternative="less"
+            prop_a=0.8,
+            prop_b=0.5,
+            n=None,
+            percent_b=0.3,
+            power=0.8,
+            sig_level=0.05,
+            alternative="less",
+            print_pretty=False,
         )["n"]
         # AB_t2n_prop(prop_A = 0.8, prop_B = 0.5, N = NULL, percent_B = .3, power = .8, sig_level = .05,
         # alternative = 'less')
@@ -148,7 +199,14 @@ class TestABProp_T2n:
         assert n_results == expected
 
         percent_b_results = pwr_tests.ab_t2n_prop(
-            prop_a=0.4, prop_b=0.8, n=500, percent_b=None, power=0.8, sig_level=0.05, alternative="greater"
+            prop_a=0.4,
+            prop_b=0.8,
+            n=500,
+            percent_b=None,
+            power=0.8,
+            sig_level=0.05,
+            alternative="greater",
+            print_pretty=False,
         )["percent_b"]
         # AB_t2n_prop(prop_A = 0.4, prop_B = 0.8, N = 500, percent_B = NULL, power = .8, sig_level = .05,
         # alternative = 'greater')
@@ -166,7 +224,13 @@ class TestABProp_T2n:
         assert percent_b_results == pytest.approx(expected, abs=1e-03)
 
         prop_b_results = pwr_tests.ab_t2n_prop(
-            prop_a=0.2, n=3_000, percent_b=0.3, power=0.8, sig_level=0.05, alternative="two-sided"
+            prop_a=0.2,
+            n=3_000,
+            percent_b=0.3,
+            power=0.8,
+            sig_level=0.05,
+            alternative="two-sided",
+            print_pretty=False,
         )["prop_b"]
         # AB_t2n_prop(prop_A = .2, N = 3000, percent_B = .3, power = .8, sig_level = .05, alternative = 'two_sided')
         #
@@ -183,7 +247,13 @@ class TestABProp_T2n:
         np.testing.assert_allclose(prop_b_results, expected, atol=1e-04)
 
         prop_a_results = pwr_tests.ab_t2n_prop(
-            prop_b=0.4, n=3_000, percent_b=0.3, power=0.8, sig_level=0.05, alternative="two-sided"
+            prop_b=0.4,
+            n=3_000,
+            percent_b=0.3,
+            power=0.8,
+            sig_level=0.05,
+            alternative="two-sided",
+            print_pretty=False,
         )["prop_a"]
         # AB_t2n_prop(prop_B = .4, N = 3000, percent_B = .3, power = .8, sig_level = .05, alternative = 'two_sided')
         #
