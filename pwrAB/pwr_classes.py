@@ -268,11 +268,11 @@ class ab_t2n_prop_class:
         sd_a = sqrt(prop_a * (1 - prop_a))
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
-        var_a = sd_a ** 2
-        var_b = self.sd_b ** 2
+        var_a = sd_a**2
+        var_b = self.sd_b**2
         pooled_var = var_a / n_a + var_b / n_b
 
-        df_ws = pooled_var ** 2 / ((var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1))
+        df_ws = pooled_var**2 / ((var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1))
         t_stat = mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
@@ -282,7 +282,7 @@ class ab_t2n_prop_class:
             result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
         else:
             result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return result
+        return float(result)
 
     def _get_prop_b(self, prop_b: float) -> float:
         """Calculate power difference for given prop_b (root finding helper)."""
@@ -290,11 +290,11 @@ class ab_t2n_prop_class:
         sd_b = sqrt(prop_b * (1 - prop_b))
         n_b = self.n * self.percent_b
         n_a = self.n - n_b
-        var_a = self.sd_a ** 2
-        var_b = sd_b ** 2
+        var_a = self.sd_a**2
+        var_b = sd_b**2
         pooled_var = var_a / n_a + var_b / n_b
 
-        df_ws = pooled_var ** 2 / ((var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1))
+        df_ws = pooled_var**2 / ((var_a / n_a) ** 2 / (n_a - 1) + (var_b / n_b) ** 2 / (n_b - 1))
         t_stat = mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
@@ -326,28 +326,28 @@ class ab_t2n_prop_class:
                 self.prop_a = brentq(self._get_prop_a, self.prop_b, 1)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = bisect(self._get_prop_a, self.prop_b, 1)
+                    root_1 = brentq(self._get_prop_a, self.prop_b, 1)
                 except ValueError:
                     try:
-                        root_1 = bisect(self._get_prop_a, self.prop_b, 0.75)
+                        root_1 = brentq(self._get_prop_a, self.prop_b, 0.75)
                     except ValueError:
                         try:
-                            root_1 = bisect(self._get_prop_a, self.prop_b, 0.5)
+                            root_1 = brentq(self._get_prop_a, self.prop_b, 0.5)
+                        except ValueError:
+                            root_1 = None
+                try:
+                    root_2 = bisect(self._get_prop_a, 0, self.prop_b)
+                except ValueError:
+                    try:
+                        root_2 = bisect(self._get_prop_a, 0.1, self.prop_b)
+                    except ValueError:
+                        try:
+                            root_2 = bisect(self._get_prop_a, 0.2, self.prop_b)
                         except ValueError:
                             try:
-                                root_1 = bisect(self._get_prop_a, self.prop_b, 0.25)
+                                root_2 = bisect(self._get_prop_a, 0.3, self.prop_b)
                             except ValueError:
-                                root_1 = None
-                try:
-                    root_2 = toms748(self._get_prop_a, 0, self.prop_b)
-                except ValueError:
-                    try:
-                        root_2 = toms748(self._get_prop_a, 0.1, self.prop_b)
-                    except ValueError:
-                        try:
-                            root_2 = toms748(self._get_prop_a, 0.2, self.prop_b)
-                        except ValueError:
-                            root_2 = None
+                                root_2 = None
                 if root_1 is not None:
                     if root_2 is not None:
                         self.prop_a = [root_2, root_1]
