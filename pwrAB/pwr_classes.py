@@ -4,7 +4,7 @@ from math import ceil, sqrt
 from typing import Any
 
 import numpy as np
-from scipy.optimize import bisect, brentq, ridder, toms748
+from scipy.optimize import bisect, brentq, ridder
 from scipy.stats import nct
 from scipy.stats import t as t_dist
 
@@ -336,16 +336,16 @@ class ab_t2n_prop_class:
                         except ValueError:
                             root_1 = None
                 try:
-                    root_2 = bisect(self._get_prop_a, 0, self.prop_b)
+                    root_2 = ridder(self._get_prop_a, 0, self.prop_b)
                 except ValueError:
                     try:
-                        root_2 = bisect(self._get_prop_a, 0.1, self.prop_b)
+                        root_2 = ridder(self._get_prop_a, 0.1, self.prop_b)
                     except ValueError:
                         try:
-                            root_2 = bisect(self._get_prop_a, 0.2, self.prop_b)
+                            root_2 = ridder(self._get_prop_a, 0.2, self.prop_b)
                         except ValueError:
                             try:
-                                root_2 = bisect(self._get_prop_a, 0.3, self.prop_b)
+                                root_2 = ridder(self._get_prop_a, 0.3, self.prop_b)
                             except ValueError:
                                 root_2 = None
                 if root_1 is not None:
