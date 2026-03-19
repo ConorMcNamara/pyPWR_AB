@@ -1,15 +1,52 @@
 from __future__ import annotations
 
 from math import ceil, sqrt
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
-from scipy.optimize import bisect, brentq, ridder
-from scipy.stats import nct
-from scipy.stats import t as t_dist
+import scipy.optimize  # type: ignore[import-untyped]
+import scipy.stats  # type: ignore[import-untyped]
 
 
+# ---------------------------------------------------------------------------
+# Typed wrappers for scipy functions
+# All type: ignore comments are isolated here so the rest of the file is clean.
+# ---------------------------------------------------------------------------
+
+
+def _bisect(f: Callable[[float], float], a: float, b: float) -> float:
+    return float(scipy.optimize.bisect(f, a, b))  # type: ignore[no-untyped-call, arg-type]
+
+
+def _brentq(f: Callable[[float], float], a: float, b: float) -> float:
+    return float(scipy.optimize.brentq(f, a, b))  # type: ignore[no-untyped-call, arg-type]
+
+
+def _ridder(f: Callable[[float], float], a: float, b: float) -> float:
+    return float(scipy.optimize.ridder(f, a, b))  # type: ignore[no-untyped-call, arg-type]
+
+
+def _nct_cdf(x: float, df: float, nc: float) -> float:
+    return float(scipy.stats.nct.cdf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
+
+
+def _nct_sf(x: float, df: float, nc: float) -> float:
+    return float(scipy.stats.nct.sf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
+
+
+def _t_ppf(q: float, df: float) -> float:
+    return float(scipy.stats.t.ppf(q, df=df))  # type: ignore[no-untyped-call]
+
+
+def _t_isf(q: float, df: float) -> float:
+    return float(scipy.stats.t.isf(q, df=df))  # type: ignore[no-untyped-call]
+
+
+# ---------------------------------------------------------------------------
 # Continuous Class
+# ---------------------------------------------------------------------------
+
+
 class ab_t2n_class:
     """Power analysis class for AB testing with continuous outcomes using Welch's t-test."""
 
@@ -47,13 +84,13 @@ class ab_t2n_class:
         t_stat = self.mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            power = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
+            power = _nct_cdf(_t_ppf(self.sig_level, df_ws), df_ws, t_stat)
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            power = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat)
+            qu = _t_isf(self.sig_level / 2, df_ws)
+            power = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat)
         else:
-            power = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
-        return float(power)
+            power = _nct_sf(_t_isf(self.sig_level, df_ws), df_ws, t_stat)
+        return power
 
     def _get_n(self, n: float) -> float:
         """Calculate power difference for given sample size (root finding helper)."""
@@ -67,13 +104,13 @@ class ab_t2n_class:
         t_stat = self.mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_cdf(_t_ppf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
+            qu = _t_isf(self.sig_level / 2, df_ws)
+            result = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat) - self.power
         else:
-            result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return float(result)
+            result = _nct_sf(_t_isf(self.sig_level, df_ws), df_ws, t_stat) - self.power
+        return result
 
     def _get_percent_b(self, percent_b: float) -> float:
         """Calculate power difference for given percent_b (root finding helper)."""
@@ -87,13 +124,13 @@ class ab_t2n_class:
         t_stat = self.mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_cdf(_t_ppf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
+            qu = _t_isf(self.sig_level / 2, df_ws)
+            result = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat) - self.power
         else:
-            result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return float(result)
+            result = _nct_sf(_t_isf(self.sig_level, df_ws), df_ws, t_stat) - self.power
+        return result
 
     def _get_mean_diff(self, mean_diff: float) -> float:
         """Calculate power difference for given mean difference (root finding helper)."""
@@ -107,13 +144,13 @@ class ab_t2n_class:
         t_stat = mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_cdf(_t_ppf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
+            qu = _t_isf(self.sig_level / 2, df_ws)
+            result = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat) - self.power
         else:
-            result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return float(result)
+            result = _nct_sf(_t_isf(self.sig_level, df_ws), df_ws, t_stat) - self.power
+        return result
 
     def _get_sig_level(self, sig_level: float) -> float:
         """Calculate power difference for given significance level (root finding helper)."""
@@ -127,13 +164,13 @@ class ab_t2n_class:
         t_stat = self.mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            result = nct.cdf(t_dist.ppf(sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_cdf(_t_ppf(sig_level, df_ws), df_ws, t_stat) - self.power
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(sig_level / 2, df=df_ws)
-            result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
+            qu = _t_isf(sig_level / 2, df_ws)
+            result = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat) - self.power
         else:
-            result = nct.sf(t_dist.isf(sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
-        return float(result)
+            result = _nct_sf(_t_isf(sig_level, df_ws), df_ws, t_stat) - self.power
+        return result
 
     def pwr_test(self) -> dict[str, Any]:
         """
@@ -150,9 +187,9 @@ class ab_t2n_class:
         elif self.n is None:
             min_n = max((5 / self.percent_b), (5 / (1 - self.percent_b)))
             try:
-                self.n = ceil(bisect(self._get_n, min_n, self.max_sample + 1))
+                self.n = ceil(_bisect(self._get_n, min_n, self.max_sample + 1))
             except ValueError:
-                self.n = ceil(bisect(self._get_n, min_n, self.max_sample / 10 + 1))
+                self.n = ceil(_bisect(self._get_n, min_n, self.max_sample / 10 + 1))
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
             search_grid = np.arange(min_percent_b, 1 - min_percent_b, 0.0001)
@@ -160,11 +197,11 @@ class ab_t2n_class:
             self.percent_b = search_grid[min(np.where(diff_power > 0)[0])]
         elif self.mean_diff is None:
             if self.alternative == "less":  # type: ignore[unreachable]
-                self.mean_diff = brentq(self._get_mean_diff, -10_000, 0)
+                self.mean_diff = _brentq(self._get_mean_diff, -10_000, 0)
             else:
-                self.mean_diff = brentq(self._get_mean_diff, 0, 10_000)
+                self.mean_diff = _brentq(self._get_mean_diff, 0, 10_000)
         elif self.sig_level is None:
-            self.sig_level = brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
+            self.sig_level = _brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
         else:
             raise ValueError("One of power, n, percent_b, mean_diff or sig_level must be None")
         return {
@@ -180,7 +217,11 @@ class ab_t2n_class:
         }
 
 
+# ---------------------------------------------------------------------------
 # Proportion Class
+# ---------------------------------------------------------------------------
+
+
 class ab_t2n_prop_class:
     """Power analysis class for AB testing with proportion outcomes using Welch's t-test."""
 
@@ -276,12 +317,12 @@ class ab_t2n_prop_class:
         t_stat = mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_cdf(_t_ppf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
+            qu = _t_isf(self.sig_level / 2, df_ws)
+            result = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat) - self.power
         else:
-            result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_sf(_t_isf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         return float(result)
 
     def _get_prop_b(self, prop_b: float) -> float:
@@ -298,12 +339,12 @@ class ab_t2n_prop_class:
         t_stat = mean_diff / sqrt(pooled_var)
 
         if self.alternative == "less":
-            result = nct.cdf(t_dist.ppf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_cdf(_t_ppf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         elif self.alternative == "two-sided":
-            qu = t_dist.isf(self.sig_level / 2, df=df_ws)
-            result = nct.sf(qu, df=df_ws, nc=t_stat) + nct.cdf(-qu, df=df_ws, nc=t_stat) - self.power
+            qu = _t_isf(self.sig_level / 2, df_ws)
+            result = _nct_sf(qu, df_ws, t_stat) + _nct_cdf(-qu, df_ws, t_stat) - self.power
         else:
-            result = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat) - self.power
+            result = _nct_sf(_t_isf(self.sig_level, df_ws), df_ws, t_stat) - self.power
         return float(result)
 
     def pwr_test(self) -> dict[str, Any]:
@@ -320,32 +361,34 @@ class ab_t2n_prop_class:
             self.power = self._get_power()
         elif self.n is None:
             min_n = max((5 / self.percent_b), (5 / (1 - self.percent_b)))
-            self.n = ceil(bisect(self._get_n, min_n, self.max_sample + 1))
+            self.n = ceil(_bisect(self._get_n, min_n, self.max_sample + 1))
         elif self.prop_a is None:
+            if not isinstance(self.prop_b, float):
+                raise TypeError(f"prop_b must be a float, got {type(self.prop_b).__name__}")
             if self.alternative == "less":
-                self.prop_a = brentq(self._get_prop_a, self.prop_b, 1)
+                self.prop_a = _brentq(self._get_prop_a, self.prop_b, 1)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = brentq(self._get_prop_a, self.prop_b, 1)
+                    root_1: float | None = _brentq(self._get_prop_a, self.prop_b, 1)
                 except ValueError:
                     try:
-                        root_1 = brentq(self._get_prop_a, self.prop_b, 0.75)
+                        root_1 = _brentq(self._get_prop_a, self.prop_b, 0.75)
                     except ValueError:
                         try:
-                            root_1 = brentq(self._get_prop_a, self.prop_b, 0.5)
+                            root_1 = _brentq(self._get_prop_a, self.prop_b, 0.5)
                         except ValueError:
                             root_1 = None
                 try:
-                    root_2 = ridder(self._get_prop_a, 0, self.prop_b)
+                    root_2: float | None = _ridder(self._get_prop_a, 0, self.prop_b)
                 except ValueError:
                     try:
-                        root_2 = ridder(self._get_prop_a, 0.1, self.prop_b)
+                        root_2 = _ridder(self._get_prop_a, 0.1, self.prop_b)
                     except ValueError:
                         try:
-                            root_2 = ridder(self._get_prop_a, 0.2, self.prop_b)
+                            root_2 = _ridder(self._get_prop_a, 0.2, self.prop_b)
                         except ValueError:
                             try:
-                                root_2 = ridder(self._get_prop_a, 0.3, self.prop_b)
+                                root_2 = _ridder(self._get_prop_a, 0.3, self.prop_b)
                             except ValueError:
                                 root_2 = None
                 if root_1 is not None:
@@ -358,41 +401,43 @@ class ab_t2n_prop_class:
                 else:
                     self.prop_a = None  # type: ignore[unreachable]
             else:
-                self.prop_a = brentq(self._get_prop_a, 0, self.prop_b)
+                self.prop_a = _brentq(self._get_prop_a, 0, self.prop_b)
         elif self.prop_b is None:
+            if not isinstance(self.prop_a, float):
+                raise TypeError(f"prop_a must be a float, got {type(self.prop_a).__name__}")
             if self.alternative == "less":
-                self.prop_b = brentq(self._get_prop_b, self.prop_a, 1)
+                self.prop_b = _brentq(self._get_prop_b, self.prop_a, 1)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = ridder(self._get_prop_b, self.prop_a, 1)
+                    root_1 = _ridder(self._get_prop_b, self.prop_a, 1)
                 except ValueError:
                     try:
-                        root_1 = ridder(self._get_prop_b, self.prop_a, 0.75)
+                        root_1 = _ridder(self._get_prop_b, self.prop_a, 0.75)
                     except ValueError:
                         try:
-                            root_1 = ridder(self._get_prop_b, self.prop_a, 0.5)
+                            root_1 = _ridder(self._get_prop_b, self.prop_a, 0.5)
                         except ValueError:
-                            root_1 = ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)  # type: ignore[operator]
+                            root_1 = _ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)
                 try:
-                    root_2 = ridder(self._get_prop_b, 0, self.prop_a)
+                    root_2 = _ridder(self._get_prop_b, 0, self.prop_a)
                 except ValueError:
                     try:
-                        root_2 = ridder(self._get_prop_b, 0.1, self.prop_a)
+                        root_2 = _ridder(self._get_prop_b, 0.1, self.prop_a)
                     except ValueError:
                         try:
-                            root_2 = ridder(self._get_prop_b, 0.2, self.prop_a)
+                            root_2 = _ridder(self._get_prop_b, 0.2, self.prop_a)
                         except ValueError:
-                            root_2 = ridder(self._get_prop_b, self.prop_a - 0.1, self.prop_a)  # type: ignore[operator]
+                            root_2 = _ridder(self._get_prop_b, self.prop_a - 0.1, self.prop_a)
                 self.prop_b = [root_2, root_1]
             else:
-                self.prop_b = brentq(self._get_prop_b, 0, self.prop_a)
+                self.prop_b = _brentq(self._get_prop_b, 0, self.prop_a)
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
             search_grid = np.arange(min_percent_b, 1 - min_percent_b, 0.0001)
             diff_power = np.array(list(map(self._get_percent_b, search_grid)))  # type: ignore[arg-type]
             self.percent_b = search_grid[min(np.where(diff_power > 0)[0])]
         elif self.sig_level is None:
-            self.sig_level = brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
+            self.sig_level = _brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
         else:
             raise ValueError("One of power, n, percent_b, prop_a, prop_b or sig_level must be None")
         return {
