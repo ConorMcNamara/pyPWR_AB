@@ -280,7 +280,7 @@ ruff format .
 ruff check .
 
 # Type check
-mypy pwrAB --ignore-missing-imports
+zuban check pwrAB --ignore-missing-imports
 ```
 
 ## 🤝 Contributing

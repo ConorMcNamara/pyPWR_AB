@@ -55,7 +55,7 @@ class ab_t2n_class:
             power = nct.sf(t_dist.isf(self.sig_level, df=df_ws), df=df_ws, nc=t_stat)
         return float(power)
 
-    def _get_n(self, n: int) -> float:
+    def _get_n(self, n: float) -> float:
         """Calculate power difference for given sample size (root finding helper)."""
         n_b = n * self.percent_b
         n_a = n - n_b
@@ -159,7 +159,7 @@ class ab_t2n_class:
             diff_power = np.array(list(map(self._get_percent_b, search_grid)))  # type: ignore[arg-type]
             self.percent_b = search_grid[min(np.where(diff_power > 0)[0])]
         elif self.mean_diff is None:
-            if self.alternative == "less":
+            if self.alternative == "less":  # type: ignore[unreachable]
                 self.mean_diff = brentq(self._get_mean_diff, -10_000, 0)
             else:
                 self.mean_diff = brentq(self._get_mean_diff, 0, 10_000)
@@ -223,7 +223,7 @@ class ab_t2n_prop_class:
             self.max_sample,
         )._get_power()
 
-    def _get_n(self, n: int) -> float:
+    def _get_n(self, n: float) -> float:
         return ab_t2n_class(
             self.n,
             self.percent_b,
@@ -352,11 +352,11 @@ class ab_t2n_prop_class:
                     if root_2 is not None:
                         self.prop_a = [root_2, root_1]
                     else:
-                        self.prop_a = root_1
+                        self.prop_a = root_1  # type: ignore[unreachable]
                 elif root_2 is not None:
                     self.prop_a = root_2
                 else:
-                    self.prop_a = None
+                    self.prop_a = None  # type: ignore[unreachable]
             else:
                 self.prop_a = brentq(self._get_prop_a, 0, self.prop_b)
         elif self.prop_b is None:
@@ -383,10 +383,7 @@ class ab_t2n_prop_class:
                             root_2 = ridder(self._get_prop_b, 0.2, self.prop_a)
                         except ValueError:
                             root_2 = ridder(self._get_prop_b, self.prop_a - 0.1, self.prop_a)  # type: ignore[operator]
-                if root_1 is not None:
-                    self.prop_b = [root_2, root_1] if root_2 is not None else root_1
-                else:
-                    self.prop_b = root_2 if root_2 is not None else None
+                self.prop_b = [root_2, root_1]
             else:
                 self.prop_b = brentq(self._get_prop_b, 0, self.prop_a)
         elif self.percent_b is None:

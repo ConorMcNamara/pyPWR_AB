@@ -8,7 +8,7 @@ PYTHON := python3
 PIP := $(PYTHON) -m pip
 PYTEST := $(PYTHON) -m pytest
 RUFF := ruff
-MYPY := mypy
+ZUBAN := zuban
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -37,11 +37,11 @@ test-all: ## Run all tests across multiple Python versions (requires tox)
 	tox
 
 # Code quality targets
-lint: ## Run all linters (ruff + mypy)
+lint: ## Run all linters (ruff + zuban)
 	@echo "Running ruff check..."
 	$(RUFF) check .
-	@echo "\nRunning mypy..."
-	$(MYPY) pwrAB --ignore-missing-imports
+	@echo "\nRunning zuban..."
+	$(ZUBAN) check pwrAB --ignore-missing-imports
 	@echo "\n✅ All linting checks passed!"
 
 format: ## Format code with ruff
@@ -52,8 +52,8 @@ format: ## Format code with ruff
 format-check: ## Check if code is formatted (CI mode)
 	$(RUFF) format --check .
 
-type-check: ## Run type checking with mypy
-	$(MYPY) pwrAB --ignore-missing-imports
+type-check: ## Run type checking with zuban
+	$(ZUBAN) check pwrAB --ignore-missing-imports
 
 # Cleaning targets
 clean: clean-build clean-pyc clean-test ## Remove all build, test, coverage and Python artifacts
@@ -73,7 +73,7 @@ clean-pyc: ## Remove Python file artifacts
 
 clean-test: ## Remove test and coverage artifacts
 	rm -rf .pytest_cache/
-	rm -rf .mypy_cache/
+	rm -rf .zuban_cache/
 	rm -rf .ruff_cache/
 	rm -rf htmlcov/
 	rm -f .coverage
@@ -120,7 +120,7 @@ update-deps: ## Update all dependencies to latest versions
 	$(PIP) install --upgrade pip setuptools wheel
 	$(PIP) install --upgrade -e ".[dev]"
 
-freeze-deps: ## Freeze current dependencies to requirements.txt
+freeze-deps: ## Freeze current dependencies to requirements-frozen.txt
 	$(PIP) freeze > requirements-frozen.txt
 
 # Documentation targets
