@@ -45,6 +45,9 @@ Repository = "https://github.com/ConorMcNamara/pyPWR_AB"
 Issues = "https://github.com/ConorMcNamara/pyPWR_AB/issues"
 Documentation = "https://github.com/ConorMcNamara/pyPWR_AB#readme"
 
+[tool.poetry]
+packages = [{include = "pwrAB"}]
+
 [build-system]
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
