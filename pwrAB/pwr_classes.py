@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from math import ceil, sqrt
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import scipy.optimize  # type: ignore[import-untyped]
 import scipy.stats  # type: ignore[import-untyped]
+
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 # ---------------------------------------------------------------------------
