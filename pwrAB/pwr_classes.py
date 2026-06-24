@@ -1,3 +1,5 @@
+"""Power analysis classes for Welch's unequal-variance t-test in AB testing."""
+
 from __future__ import annotations
 
 from math import ceil, sqrt
@@ -52,7 +54,31 @@ def _t_isf(q: float, df: float) -> float:
 
 
 class ab_t2n_class:
-    """Power analysis class for AB testing with continuous outcomes using Welch's t-test."""
+    """
+    Power analysis class for AB testing with continuous outcomes using Welch's t-test.
+
+    Parameters
+    ----------
+    n : int, optional
+        Total number of observations (sum of observations for groups A and B).
+    percent_b : float, optional
+        Percentage of total observations allocated to group B (between 0 and 1,
+        e.g., input 0.5 for 50%).
+    mean_diff : float, optional
+        Difference in means of the two groups (mean_B - mean_A).
+    sd_a : float, default=1
+        Standard deviation of group A. Must be positive.
+    sd_b : float, default=1
+        Standard deviation of group B. Must be positive.
+    sig_level : float, optional
+        Significance level (Type I error probability). Must be between 0 and 1.
+    power : float, optional
+        Power of test (1 minus Type II error probability). Must be between 0 and 1.
+    alternative : {'two-sided', 'greater', 'less'}, default='two-sided'
+        Specifies the alternative hypothesis.
+    max_sample : int or float, default=1e07
+        Maximum sample size to search for when solving for n.
+    """
 
     def __init__(
         self,
@@ -227,7 +253,29 @@ class ab_t2n_class:
 
 
 class ab_t2n_prop_class:
-    """Power analysis class for AB testing with proportion outcomes using Welch's t-test."""
+    """
+    Power analysis class for AB testing with proportion outcomes using Welch's t-test.
+
+    Parameters
+    ----------
+    prop_a : float, optional
+        Proportion (success rate) of group A. Must be between 0 and 1.
+    prop_b : float, optional
+        Proportion (success rate) of group B. Must be between 0 and 1.
+    n : int, optional
+        Total number of observations (sum of observations for groups A and B).
+    percent_b : float, optional
+        Percentage of total observations allocated to group B (between 0 and 1,
+        e.g., input 0.5 for 50%).
+    sig_level : float, optional
+        Significance level (Type I error probability). Must be between 0 and 1.
+    power : float, optional
+        Power of test (1 minus Type II error probability). Must be between 0 and 1.
+    alternative : {'two-sided', 'greater', 'less'}, default='two-sided'
+        Specifies the alternative hypothesis.
+    max_sample : int or float, default=1e07
+        Maximum sample size to search for when solving for n.
+    """
 
     def __init__(
         self,

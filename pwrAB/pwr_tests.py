@@ -1,3 +1,5 @@
+"""Functional API for power analysis of Welch's unequal-variance t-test in AB testing."""
+
 from __future__ import annotations
 
 from typing import Any
