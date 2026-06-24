@@ -24,6 +24,11 @@ repos:
       # Run the formatter
       - id: ruff-format
 
+  - repo: https://github.com/numpy/numpydoc
+    rev: v1.10.0
+    hooks:
+      - id: numpydoc-validation
+
   - repo: local
     hooks:
       - id: zuban

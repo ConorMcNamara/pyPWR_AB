@@ -164,6 +164,7 @@ select = [
     "A",      # flake8-builtins
     "PTH",    # flake8-use-pathlib
     "PL",     # pylint
+    "D",      # pydocstyle
 ]
 ignore = [
     "PLR0913", # too-many-arguments
@@ -174,6 +175,7 @@ ignore = [
 "test/**/*.py" = [
     "ANN",     # type annotations not required in tests
     "PLR2004", # magic values OK in tests
+    "D",       # docstrings not required in tests
 ]
 "pwrAB/__init__.py" = [
     "N999",    # Module name is valid for this package
@@ -184,7 +186,28 @@ ignore = [
     "PLR0915", # pwr_test methods need many statements for comprehensive parameter handling
 ]
 
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
 [tool.ruff.lint.isort]
 known-first-party = ["pwrAB"]
 force-single-line = false
 lines-after-imports = 2
+
+[tool.numpydoc_validation]
+# Cross-check that docstrings match signatures (PR01/PR02/RT01/...).
+# Presence and overall style are already enforced by Ruff's pydocstyle (D, numpy convention).
+checks = [
+    "all",   # report everything, except the opt-outs below
+    "GL08",  # missing docstring — handled by Ruff D
+    "ES01",  # extended summary not required
+    "EX01",  # examples section not required
+    "SA01",  # "See Also" section not required
+    "SS06",  # allow summaries to wrap across lines
+]
+# Skip private helpers, dunders, and the R-convention class constructors.
+exclude = [
+    '\._',          # private functions / methods
+    '\.__init__$',
+    '\.__repr__$',
+]
