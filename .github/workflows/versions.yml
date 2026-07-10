@@ -1,0 +1,48 @@
+name: Resolve Python versions
+
+# Reusable workflow: parses the supported Python versions from pyproject.toml's
+# "Programming Language :: Python :: X.Y" classifiers and exposes them to callers.
+# Adding a new version is a one-line classifier change in pyproject.toml.
+
+on:
+  workflow_call:
+    outputs:
+      matrix:
+        description: "JSON array of supported Python versions, oldest to newest."
+        value: ${{ jobs.resolve.outputs.matrix }}
+      latest:
+        description: "The newest supported Python version."
+        value: ${{ jobs.resolve.outputs.latest }}
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: Resolve Python versions
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set.outputs.matrix }}
+      latest: ${{ steps.set.outputs.latest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read supported versions from pyproject.toml
+        id: set
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, tomllib
+          with open("pyproject.toml", "rb") as f:
+              data = tomllib.load(f)
+          prefix = "Programming Language :: Python :: "
+          vers = sorted(
+              (c[len(prefix):] for c in data["project"]["classifiers"]
+               if c.startswith(prefix) and "." in c[len(prefix):]),
+              key=lambda v: tuple(map(int, v.split("."))),
+          )
+          if not vers:
+              raise SystemExit("No 'Programming Language :: Python :: X.Y' classifiers found in pyproject.toml")
+          print("matrix=" + json.dumps(vers))
+          print("latest=" + vers[-1])
+          PY

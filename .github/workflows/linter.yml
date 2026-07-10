@@ -14,21 +14,22 @@ permissions:
   contents: read
 
 jobs:
+  versions:
+    uses: ./.github/workflows/versions.yml
+
   lint-and-type-check:
     name: Lint and Type Check
+    needs: versions
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.14"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python ${{ needs.versions.outputs.latest }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ needs.versions.outputs.latest }}
           cache: 'pip'
 
       - name: Install dependencies
