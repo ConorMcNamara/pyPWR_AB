@@ -12,6 +12,7 @@ First off, thank you for considering contributing to pyPWR_AB! It's people like 
 - [Development Setup](#development-setup)
 - [How to Contribute](#how-to-contribute)
 - [Pull Request Process](#pull-request-process)
+- [Releasing](#releasing)
 - [Coding Standards](#coding-standards)
 - [Testing Guidelines](#testing-guidelines)
 - [Documentation](#documentation)
@@ -235,6 +236,36 @@ Describe the tests you ran to verify your changes
 - [ ] New and existing tests pass locally
 - [ ] I have updated CHANGELOG.md
 ```
+
+## Releasing
+
+Releases are published to [PyPI](https://pypi.org/project/pypwr-ab/) automatically by the
+`release.yml` GitHub Actions workflow using PyPI Trusted Publishing (OIDC) — no tokens or
+secrets are involved.
+
+### Version: single source of truth
+
+The version is declared **only** in `pyproject.toml`:
+
+```toml
+[project]
+version = "1.0.0"
+```
+
+`pwrAB.__version__` is derived at runtime from the installed package metadata
+(`importlib.metadata.version("pypwr-ab")`), so there is nothing to keep in sync — bumping a
+release is a one-line edit to `version` in `pyproject.toml`.
+
+### Cutting a release
+
+1. Bump `version` in `pyproject.toml` (follow [semantic versioning](https://semver.org/)).
+2. Move the `Unreleased` entries in `CHANGELOG.md` under the new version heading.
+3. Open a PR with those changes and merge it once CI is green.
+4. (Optional) Dry-run first: **Actions → Release → Run workflow → `testpypi`**, then verify
+   `pip install -i https://test.pypi.org/simple/ pypwr-ab` picks up the new version.
+5. Publish a [GitHub Release](https://github.com/ConorMcNamara/pyPWR_AB/releases) with a
+   `vX.Y.Z` tag matching the version. This triggers `release.yml` to build with `uv build`
+   and publish to PyPI.
 
 ## Coding Standards
 
