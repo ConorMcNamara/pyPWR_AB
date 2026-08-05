@@ -329,7 +329,7 @@ def ab_t2n(
     Examples
     --------
     >>> result = ab_t2n(n=1000, power=0.8)
-    >>> print(result['effect_size'])
+    >>> print(result["effect_size"])
     0.123
     """
 ```
