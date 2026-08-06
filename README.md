@@ -62,15 +62,7 @@ pip install -e .
 from pwrAB.pwr_tests import ab_t2n
 
 # Calculate power given sample size and effect
-results = ab_t2n(
-    n=3000,
-    percent_b=0.3,
-    mean_diff=0.15,
-    sd_a=1,
-    sd_b=2,
-    sig_level=0.05,
-    alternative='two-sided'
-)
+results = ab_t2n(n=3000, percent_b=0.3, mean_diff=0.15, sd_a=1, sd_b=2, sig_level=0.05, alternative="two-sided")
 
 print(f"Statistical Power: {results['power']:.4f}")
 # Output: Statistical Power: 0.5701
@@ -87,13 +79,13 @@ from pwrAB.pwr_tests import ab_t2n
 
 # Find sample size needed for 80% power
 results = ab_t2n(
-    percent_b=0.3,        # 30% in group B
-    mean_diff=0.15,       # Expected effect size
-    sd_a=1,               # Standard deviation group A
-    sd_b=2,               # Standard deviation group B
-    sig_level=0.05,       # Alpha level
-    power=0.8,            # Desired power
-    alternative='two-sided'
+    percent_b=0.3,  # 30% in group B
+    mean_diff=0.15,  # Expected effect size
+    sd_a=1,  # Standard deviation group A
+    sd_b=2,  # Standard deviation group B
+    sig_level=0.05,  # Alpha level
+    power=0.8,  # Desired power
+    alternative="two-sided",
 )
 
 print(f"Required sample size: {results['n']}")
@@ -113,7 +105,7 @@ results = ab_t2n(
     sd_b=2,
     sig_level=0.05,
     power=0.8,
-    alternative='less'  # One-sided test
+    alternative="less",  # One-sided test
 )
 
 print(f"Minimum detectable effect: {results['mean_diff']:.4f}")
@@ -125,15 +117,7 @@ print(f"Minimum detectable effect: {results['mean_diff']:.4f}")
 from pwrAB.pwr_tests import ab_t2n
 
 # Find optimal allocation between groups
-results = ab_t2n(
-    n=1500,
-    mean_diff=0.3,
-    sd_a=1,
-    sd_b=2,
-    sig_level=0.10,
-    power=0.8,
-    alternative='two-sided'
-)
+results = ab_t2n(n=1500, mean_diff=0.3, sd_a=1, sd_b=2, sig_level=0.10, power=0.8, alternative="two-sided")
 
 print(f"Optimal allocation to group B: {results['percent_b']:.2%}")
 ```
@@ -147,12 +131,12 @@ from pwrAB.pwr_tests import ab_t2n_prop
 
 # Calculate power for a conversion rate experiment
 results = ab_t2n_prop(
-    prop_a=0.20,     # 20% conversion in control
-    prop_b=0.25,     # 25% conversion in treatment
+    prop_a=0.20,  # 20% conversion in control
+    prop_b=0.25,  # 25% conversion in treatment
     n=3000,
     percent_b=0.3,
     sig_level=0.05,
-    alternative='two-sided'
+    alternative="two-sided",
 )
 
 print(f"Statistical Power: {results['power']:.4f}")
@@ -168,10 +152,10 @@ from pwrAB.pwr_tests import ab_t2n_prop
 results = ab_t2n_prop(
     prop_a=0.20,
     prop_b=0.25,
-    percent_b=0.5,   # Equal allocation
+    percent_b=0.5,  # Equal allocation
     sig_level=0.05,
     power=0.8,
-    alternative='two-sided'
+    alternative="two-sided",
 )
 
 print(f"Required sample size: {results['n']}")
@@ -184,12 +168,12 @@ from pwrAB.pwr_tests import ab_t2n_prop
 
 # Find detectable proportions given constraints
 results = ab_t2n_prop(
-    prop_a=0.2,      # Fixed baseline
+    prop_a=0.2,  # Fixed baseline
     n=3000,
     percent_b=0.3,
     power=0.8,
     sig_level=0.05,
-    alternative='two-sided'
+    alternative="two-sided",
 )
 
 print(f"Detectable prop_b values: {results['prop_b']}")

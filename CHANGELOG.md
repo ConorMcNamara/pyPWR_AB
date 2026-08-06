@@ -12,7 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD workflows updated to test only Python 3.13 and 3.14
 
 ### Added
-- Comprehensive project documentation (CONTRIBUTING.md, MANIFEST.in, Makefile)
+- Comprehensive project documentation (CONTRIBUTING.md, Makefile)
+- Automated PyPI publishing via GitHub Actions (`release.yml`) using PyPI Trusted Publishing (OIDC), with a manual TestPyPI dry-run path
 - Pre-commit hooks configuration with ruff, mypy, and standard checks
 - Modern GitHub Actions workflows for testing and code quality
 - PEP 561 compliance with py.typed marker for type hint distribution
@@ -30,6 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved code formatting and consistency throughout codebase
 - Configured mypy with pragmatic settings for scientific computing
 - Removed auto-commit behavior from CI workflows (best practice)
+- Switched the build backend from `poetry-core` to the uv build backend (`uv_build`)
+- `Makefile` build/publish targets now use `uv build` / `uv publish`
+- `pwrAB.__version__` is now derived at runtime from installed package metadata, making the `version` in `pyproject.toml` the single source of truth
+
+### Removed
+- `poetry.lock` (the project uses `uv.lock` as the authoritative lockfile)
+- `MANIFEST.in` (the uv build backend controls sdist/wheel contents via `pyproject.toml`)
 
 ### Fixed
 - Spelling error in error message: `pro_b` → `prop_b` (pwr_classes.py:346)

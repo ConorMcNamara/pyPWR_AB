@@ -35,7 +35,7 @@ dev = [
     "pytest>=8.3.5,<9.0.0",
     "pytest-cov>=6.0.0",
     "zuban",
-    "ruff>=0.8.0",
+    "ruff==0.16.1",
     "pre-commit>=4.0.0",
 ]
 
@@ -45,12 +45,15 @@ Repository = "https://github.com/ConorMcNamara/pyPWR_AB"
 Issues = "https://github.com/ConorMcNamara/pyPWR_AB/issues"
 Documentation = "https://github.com/ConorMcNamara/pyPWR_AB#readme"
 
-[tool.poetry]
-packages = [{include = "pwrAB"}]
-
 [build-system]
-requires = ["poetry-core>=2.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.10,<0.11"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Flat layout: the import package lives at the repo root as pwrAB/, while the
+# distribution name is pypwr-ab, so the module name must be set explicitly.
+module-name = "pwrAB"
+module-root = ""
 
 [tool.pytest.ini_options]
 pythonpath = [".", "pwrAB"]
@@ -168,6 +171,7 @@ select = [
 ]
 ignore = [
     "PLR0913", # too-many-arguments
+    "PLR0917", # too-many-positional-arguments (public API functions take many params by design)
     "PLR2004", # magic-value-comparison
 ]
 

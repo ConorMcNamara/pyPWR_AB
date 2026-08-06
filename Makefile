@@ -81,16 +81,16 @@ clean-test: ## Remove test and coverage artifacts
 
 # Build and publish targets
 build: clean ## Build source and wheel package
-	$(PYTHON) -m build
+	uv build
 
 publish: build ## Build and publish package to PyPI
 	@echo "Publishing to PyPI..."
-	$(PYTHON) -m twine upload dist/*
+	uv publish
 	@echo "✅ Published to PyPI!"
 
 publish-test: build ## Build and publish package to TestPyPI
 	@echo "Publishing to TestPyPI..."
-	$(PYTHON) -m twine upload --repository testpypi dist/*
+	uv publish --publish-url https://test.pypi.org/legacy/
 	@echo "✅ Published to TestPyPI!"
 
 # Pre-commit targets
