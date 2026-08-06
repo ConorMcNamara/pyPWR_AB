@@ -171,6 +171,7 @@ select = [
 ]
 ignore = [
     "PLR0913", # too-many-arguments
+    "PLR0917", # too-many-positional-arguments (public API functions take many params by design)
     "PLR2004", # magic-value-comparison
 ]
 
