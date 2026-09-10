@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from math import ceil, sqrt
+from math import ceil, isnan, sqrt
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -33,11 +33,15 @@ def _ridder(f: Callable[[float], float], a: float, b: float) -> float:
 
 
 def _nct_cdf(x: float, df: float, nc: float) -> float:
-    return float(scipy.stats.nct.cdf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
+    val = float(scipy.stats.nct.cdf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
+    # scipy returns NaN for extreme far-tail evaluations (e.g. large |nc|);
+    # the true probability in those cases is effectively 0.
+    return 0.0 if isnan(val) else val
 
 
 def _nct_sf(x: float, df: float, nc: float) -> float:
-    return float(scipy.stats.nct.sf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
+    val = float(scipy.stats.nct.sf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
+    return 0.0 if isnan(val) else val
 
 
 def _t_ppf(q: float, df: float) -> float:
@@ -100,7 +104,12 @@ class ab_t2n_class:
         self.power = power
         self.alternative = alternative.casefold()
         self.max_sample = ceil(max_sample)
-        self.mean_diff = abs(mean_diff) if self.alternative == "two-sided" else mean_diff
+        if mean_diff is None:
+            self.mean_diff = None
+        elif self.alternative == "two-sided":
+            self.mean_diff = abs(mean_diff)
+        else:
+            self.mean_diff = mean_diff
 
     def _get_power(self) -> float:
         """Calculate power for given parameters."""
@@ -222,11 +231,20 @@ class ab_t2n_class:
                 self.n = ceil(_bisect(self._get_n, min_n, self.max_sample / 10 + 1))
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
-            search_grid = np.arange(min_percent_b, 1 - min_percent_b, 0.0001)
+            max_percent_b = 1 - min_percent_b
+            search_grid = np.arange(min_percent_b, max_percent_b, 0.0001)
             diff_power = np.array(list(map(self._get_percent_b, search_grid)))  # type: ignore[arg-type]
-            self.percent_b = search_grid[min(np.where(diff_power > 0)[0])]
+            above_target = np.where(diff_power > 0)[0]
+            if len(above_target) == 0:
+                msg = "No feasible percent_b achieves the target power for the given parameters"
+                raise ValueError(msg)
+            idx = int(min(above_target))
+            if idx > 0:
+                self.percent_b = _brentq(self._get_percent_b, search_grid[idx - 1], search_grid[idx])
+            else:
+                self.percent_b = search_grid[0]
         elif self.mean_diff is None:
-            if self.alternative == "less":  # type: ignore[unreachable]
+            if self.alternative == "less":
                 self.mean_diff = _brentq(self._get_mean_diff, -10_000, 0)
             else:
                 self.mean_diff = _brentq(self._get_mean_diff, 0, 10_000)
@@ -458,10 +476,10 @@ class ab_t2n_prop_class:
             if not isinstance(self.prop_a, float):
                 raise TypeError(f"prop_a must be a float, got {type(self.prop_a).__name__}")
             if self.alternative == "less":
-                self.prop_b = _brentq(self._get_prop_b, self.prop_a, 1)
+                self.prop_b = _brentq(self._get_prop_b, 0, self.prop_a)
             elif self.alternative == "two-sided":
                 try:
-                    root_1 = _ridder(self._get_prop_b, self.prop_a, 1)
+                    root_1: float | None = _ridder(self._get_prop_b, self.prop_a, 1)
                 except ValueError:
                     try:
                         root_1 = _ridder(self._get_prop_b, self.prop_a, 0.75)
@@ -469,9 +487,12 @@ class ab_t2n_prop_class:
                         try:
                             root_1 = _ridder(self._get_prop_b, self.prop_a, 0.5)
                         except ValueError:
-                            root_1 = _ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)
+                            try:
+                                root_1 = _ridder(self._get_prop_b, self.prop_a, self.prop_a + 0.1)
+                            except ValueError:
+                                root_1 = None
                 try:
-                    root_2 = _ridder(self._get_prop_b, 0, self.prop_a)
+                    root_2: float | None = _ridder(self._get_prop_b, 0, self.prop_a)
                 except ValueError:
                     try:
                         root_2 = _ridder(self._get_prop_b, 0.1, self.prop_a)
@@ -479,15 +500,35 @@ class ab_t2n_prop_class:
                         try:
                             root_2 = _ridder(self._get_prop_b, 0.2, self.prop_a)
                         except ValueError:
-                            root_2 = _ridder(self._get_prop_b, self.prop_a - 0.1, self.prop_a)
-                self.prop_b = [root_2, root_1]
+                            try:
+                                root_2 = _ridder(self._get_prop_b, self.prop_a - 0.1, self.prop_a)
+                            except ValueError:
+                                root_2 = None
+                if root_1 is not None:
+                    if root_2 is not None:
+                        self.prop_b = [root_2, root_1]
+                    else:
+                        self.prop_b = root_1
+                elif root_2 is not None:
+                    self.prop_b = root_2
+                else:
+                    self.prop_b = None
             else:
-                self.prop_b = _brentq(self._get_prop_b, 0, self.prop_a)
+                self.prop_b = _brentq(self._get_prop_b, self.prop_a, 1)
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
-            search_grid = np.arange(min_percent_b, 1 - min_percent_b, 0.0001)
+            max_percent_b = 1 - min_percent_b
+            search_grid = np.arange(min_percent_b, max_percent_b, 0.0001)
             diff_power = np.array(list(map(self._get_percent_b, search_grid)))  # type: ignore[arg-type]
-            self.percent_b = search_grid[min(np.where(diff_power > 0)[0])]
+            above_target = np.where(diff_power > 0)[0]
+            if len(above_target) == 0:
+                msg = "No feasible percent_b achieves the target power for the given parameters"
+                raise ValueError(msg)
+            idx = int(min(above_target))
+            if idx > 0:
+                self.percent_b = _brentq(self._get_percent_b, search_grid[idx - 1], search_grid[idx])
+            else:
+                self.percent_b = search_grid[0]
         elif self.sig_level is None:
             self.sig_level = _brentq(self._get_sig_level, 1e-10, 1 - 1e-10)
         else:
