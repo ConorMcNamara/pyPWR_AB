@@ -34,14 +34,18 @@ def _ridder(f: Callable[[float], float], a: float, b: float) -> float:
 
 def _nct_cdf(x: float, df: float, nc: float) -> float:
     val = float(scipy.stats.nct.cdf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
-    # scipy returns NaN for extreme far-tail evaluations (e.g. large |nc|);
-    # the true probability in those cases is effectively 0.
-    return 0.0 if isnan(val) else val
+    if not isnan(val):
+        return val
+    # scipy returns NaN for extreme |nc|.  When nc >> x the mass is far right
+    # of x so CDF ≈ 0; when nc << x the mass is far left so CDF ≈ 1.
+    return 0.0 if nc >= x else 1.0
 
 
 def _nct_sf(x: float, df: float, nc: float) -> float:
     val = float(scipy.stats.nct.sf(x, df=df, nc=nc))  # type: ignore[no-untyped-call]
-    return 0.0 if isnan(val) else val
+    if not isnan(val):
+        return val
+    return 1.0 if nc >= x else 0.0
 
 
 def _t_ppf(q: float, df: float) -> float:
@@ -225,14 +229,15 @@ class ab_t2n_class:
             self.power = self._get_power()
         elif self.n is None:
             min_n = max((5 / self.percent_b), (5 / (1 - self.percent_b)))
-            try:
+            if self._get_n(min_n) >= 0:
+                self.n = ceil(min_n)
+            else:
                 self.n = ceil(_bisect(self._get_n, min_n, self.max_sample + 1))
-            except ValueError:
-                self.n = ceil(_bisect(self._get_n, min_n, self.max_sample / 10 + 1))
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
             max_percent_b = 1 - min_percent_b
-            search_grid = np.arange(min_percent_b, max_percent_b, 0.0001)
+            grid_len = round((max_percent_b - min_percent_b) / 0.0001) + 1
+            search_grid = np.linspace(min_percent_b, max_percent_b, grid_len)
             diff_power = np.array(list(map(self._get_percent_b, search_grid)))  # type: ignore[arg-type]
             above_target = np.where(diff_power > 0)[0]
             if len(above_target) == 0:
@@ -431,7 +436,10 @@ class ab_t2n_prop_class:
             self.power = self._get_power()
         elif self.n is None:
             min_n = max((5 / self.percent_b), (5 / (1 - self.percent_b)))
-            self.n = ceil(_bisect(self._get_n, min_n, self.max_sample + 1))
+            if self._get_n(min_n) >= 0:
+                self.n = ceil(min_n)
+            else:
+                self.n = ceil(_bisect(self._get_n, min_n, self.max_sample + 1))
         elif self.prop_a is None:
             if not isinstance(self.prop_b, float):
                 raise TypeError(f"prop_b must be a float, got {type(self.prop_b).__name__}")
@@ -518,7 +526,8 @@ class ab_t2n_prop_class:
         elif self.percent_b is None:
             min_percent_b = max(0.001, 10 / self.n)
             max_percent_b = 1 - min_percent_b
-            search_grid = np.arange(min_percent_b, max_percent_b, 0.0001)
+            grid_len = round((max_percent_b - min_percent_b) / 0.0001) + 1
+            search_grid = np.linspace(min_percent_b, max_percent_b, grid_len)
             diff_power = np.array(list(map(self._get_percent_b, search_grid)))  # type: ignore[arg-type]
             above_target = np.where(diff_power > 0)[0]
             if len(above_target) == 0:
